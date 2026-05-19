@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>MainTendue - Entraide Sociale</title>
+  <title>ElanProtect - Entraide Sociale</title>
   <meta name="description" content="Plateforme d'entraide pour les personnes sans-abri et en difficulté. Carte des ressources, tchat communautaire, signalement urgent.">
   <meta name="theme-color" content="#1E40AF">
   <link rel="manifest" href="/manifest.json">
@@ -715,7 +715,7 @@
 <div class="header">
   <div class="header-logo">🤝</div>
   <div>
-    <div class="header-title">MainTendue</div>
+    <div class="header-title">ElanProtect</div>
     <div class="header-sub">Entraide solidaire</div>
   </div>
   <button class="header-sos" onclick="goTo('signalement')">🆘 SOS</button>
@@ -1825,7 +1825,7 @@ async function publierDon() {
     titre,
     description: document.getElementById('don-description').value,
     ville: document.getElementById('don-ville').value,
-    contact: document.getElementById('don-contact').value || 'Tchat MainTendue'
+    contact: document.getElementById('don-contact').value || 'Tchat ElanProtect'
   };
   try {
     const res = await fetch('/api/dons', {
@@ -1846,18 +1846,28 @@ async function publierDon() {
   } catch { toast('Erreur réseau'); }
 }
 
-// Charger dons quand on arrive sur la page
-const _goToOriginal = goTo;
-function goTo(page) {
+// Charger dons quand on arrive sur la page — patch goTo
+const _goToBase2 = goTo;
+goTo = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page).classList.add('active');
+  const pageEl = document.getElementById('page-' + page);
+  const navEl = document.getElementById('nav-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  if (navEl) navEl.classList.add('active');
   pageActive = page;
   if (page === 'carte' && !carteInitialisee) initCarte();
   if (page === 'tchat' && !tchatInitialise) initTchat();
   if (page === 'dons') chargerDons();
-}
+  if (page === 'guide') {
+    document.getElementById('guide-plan-screen').style.display = 'none';
+    document.getElementById('guide-questions-screen').style.display = 'block';
+  }
+  if (page === 'signalement') {
+    document.getElementById('signalement-ecran-urgence').style.display = 'flex';
+    document.getElementById('signalement-ecran-formulaire').style.display = 'none';
+  }
+};
 
 // ===== MODÉRATION COMMUNAUTAIRE =====
 async function signalerMessage(id, btn) {

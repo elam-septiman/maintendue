@@ -6,8 +6,8 @@ const WebSocket = require('ws');
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017';
-const DB_NAME = 'maintendue';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'maintendue2026';
+const DB_NAME = 'elanprotect';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'elanprotect2026';
 
 let db;
 

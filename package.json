@@ -1,5 +1,5 @@
 {
-  "name": "maintendue",
+  "name": "elanprotect",
   "version": "1.0.0",
   "description": "Plateforme d'entraide sociale - Mise en relation sans-abris, bénévoles et associations",
   "main": "server.js",
