@@ -650,6 +650,26 @@ const server = http.createServer(async (req, res) => {
     }
 
     // Stats publiques
+    // ===== IMPACT PUBLIC =====
+    if (pathname === '/api/impact' && req.method === 'GET') {
+      const [points, signalementsTotal, signalements24h, donsTotal, messagesTotal, agendaTotal, maraudes] = await Promise.all([
+        db.collection('points').countDocuments({ actif: true }),
+        db.collection('signalements').countDocuments(),
+        db.collection('signalements').countDocuments({ date: { $gte: new Date(Date.now() - 86400000) } }),
+        db.collection('dons').countDocuments({ actif: true }),
+        db.collection('messages').countDocuments(),
+        db.collection('agenda').countDocuments({ actif: true }),
+        db.collection('maraudes').countDocuments({ actif: true }),
+      ]);
+      res.writeHead(200);
+      return res.end(JSON.stringify({
+        connectes: wss.clients.size,
+        points, signalementsTotal, signalements24h,
+        donsTotal, messagesTotal, agendaTotal,
+        villes: 11, associations: 5, maraudes
+      }));
+    }
+
     if (pathname === '/api/stats' && req.method === 'GET') {
       const [points, signalements24h, dons, messages] = await Promise.all([
         db.collection('points').countDocuments({ actif: true }),
@@ -820,6 +840,28 @@ wss.on('connection', (ws) => {
           .find({ salon, supprime: { $ne: true } })
           .sort({ date: -1 }).limit(50).toArray();
         ws.send(JSON.stringify({ type: 'history', messages: messages.reverse() }));
+        return;
+      }
+
+      // Alerte danger discret
+      if (data.type === 'alerte_danger') {
+        const info = clients.get(ws);
+        const alerte = {
+          type: 'alerte_danger',
+          lat: parseFloat(data.lat) || null,
+          lng: parseFloat(data.lng) || null,
+          ville: info ? info.salon : 'Inconnue',
+          date: new Date()
+        };
+        // Stocker en base
+        await db.collection('signalements').insertOne({
+          type: 'danger_bouton',
+          message: '🚨 Alerte danger activée via le bouton discret',
+          ville: alerte.ville, lat: alerte.lat, lng: alerte.lng,
+          date: alerte.date, traite: false
+        });
+        // Diffuser à tous
+        broadcastAll({ type: 'alerte_danger', alerte });
         return;
       }
 

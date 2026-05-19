@@ -843,6 +843,173 @@
       margin-top: 8px;
     }
 
+    /* ========== BOUTON DANGER DISCRET ========== */
+    .danger-fab {
+      position: fixed; bottom: 76px; right: 14px; z-index: 300;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--rouge); color: white; border: none;
+      font-size: 22px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(220,38,38,0.5);
+      transition: transform 0.1s;
+      -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+    }
+    .danger-fab:active { transform: scale(0.95); }
+
+    .danger-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      background: rgba(220,38,38,0.92); flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
+      text-align: center; padding: 32px;
+    }
+    .danger-overlay.visible { display: flex; }
+    .danger-overlay h2 { color: white; font-size: 22px; font-weight: 900; }
+    .danger-overlay p { color: rgba(255,255,255,0.85); font-size: 14px; }
+
+    .danger-ring {
+      width: 140px; height: 140px; border-radius: 50%;
+      border: 6px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .danger-ring-progress {
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      background: conic-gradient(white 0deg, transparent 0deg);
+      transition: none;
+    }
+    .danger-ring-num {
+      font-size: 56px; font-weight: 900; color: white; z-index: 1;
+    }
+    .danger-annuler {
+      background: rgba(255,255,255,0.2); border: 2px solid white;
+      color: white; padding: 12px 28px; border-radius: 30px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .danger-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .danger-action-btn {
+      padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 800;
+      border: none; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+    }
+    .danger-sms { background: white; color: var(--rouge); }
+    .danger-tel { background: rgba(255,255,255,0.15); color: white; border: 2px solid white; }
+
+    /* ========== PAGE IMPACT ========== */
+    #page-impact { overflow-y: auto; gap: 0; }
+    .impact-hero {
+      background: linear-gradient(135deg, #1E40AF, #7C3AED);
+      color: white; padding: 28px 20px; text-align: center;
+    }
+    .impact-hero .icon { font-size: 52px; margin-bottom: 10px; }
+    .impact-hero h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+    .impact-hero p { font-size: 13px; opacity: 0.9; line-height: 1.5; }
+
+    .impact-live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.2); border-radius: 20px;
+      padding: 4px 12px; font-size: 12px; font-weight: 700; margin-top: 10px;
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #4ADE80;
+      animation: blink 1.5s infinite;
+    }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+    .impact-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding: 16px;
+    }
+    .impact-card {
+      background: var(--blanc); border-radius: var(--radius);
+      padding: 18px 14px; box-shadow: var(--shadow); text-align: center;
+      border-top: 4px solid var(--bleu);
+    }
+    .impact-card.rouge { border-top-color: var(--rouge); }
+    .impact-card.vert { border-top-color: var(--vert); }
+    .impact-card.orange { border-top-color: var(--orange); }
+    .impact-card.violet { border-top-color: #7C3AED; }
+    .impact-card.cyan { border-top-color: #0891B2; }
+    .impact-card.full { grid-column: 1 / -1; }
+
+    .impact-num {
+      font-size: 38px; font-weight: 900; color: var(--bleu); line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .impact-card.rouge .impact-num { color: var(--rouge); }
+    .impact-card.vert .impact-num { color: var(--vert); }
+    .impact-card.orange .impact-num { color: var(--orange); }
+    .impact-card.violet .impact-num { color: #7C3AED; }
+    .impact-card.cyan .impact-num { color: #0891B2; }
+    .impact-label { font-size: 12px; color: var(--gris); margin-top: 4px; font-weight: 600; }
+    .impact-sub { font-size: 10px; color: var(--gris); margin-top: 2px; }
+
+    .impact-section { padding: 0 16px 16px; }
+    .impact-section-title {
+      font-size: 15px; font-weight: 800; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .impact-asso-card {
+      background: var(--blanc); border-radius: 12px;
+      padding: 14px; box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    }
+    .impact-asso-icon { font-size: 30px; flex-shrink: 0; }
+    .impact-asso-info { flex: 1; }
+    .impact-asso-nom { font-size: 14px; font-weight: 700; }
+    .impact-asso-desc { font-size: 12px; color: var(--gris); margin-top: 2px; }
+    .impact-asso-tel { font-size: 13px; font-weight: 800; color: var(--bleu); text-decoration: none; }
+
+    .impact-connectes-banner {
+      background: linear-gradient(135deg, #065F46, #16A34A);
+      color: white; border-radius: var(--radius); padding: 16px;
+      display: flex; align-items: center; gap: 14px; margin: 0 16px 16px;
+    }
+    .impact-connectes-num { font-size: 36px; font-weight: 900; }
+    .impact-connectes-label { font-size: 13px; opacity: 0.9; }
+
+    /* ========== PAGE CONFIDENTIALITÉ ========== */
+    #page-confidentialite { overflow-y: auto; gap: 0; }
+    .confid-hero {
+      background: linear-gradient(135deg, #1E293B, #334155);
+      color: white; padding: 28px 20px; text-align: center;
+    }
+    .confid-hero .icon { font-size: 52px; margin-bottom: 10px; }
+    .confid-hero h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+    .confid-hero p { font-size: 13px; opacity: 0.9; line-height: 1.5; }
+
+    .confid-section { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    .confid-card {
+      background: var(--blanc); border-radius: var(--radius);
+      padding: 18px; box-shadow: var(--shadow);
+    }
+    .confid-card-title {
+      font-size: 15px; font-weight: 800; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .confid-item {
+      display: flex; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid var(--gris-clair); font-size: 13px;
+    }
+    .confid-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .confid-item .icon { font-size: 18px; flex-shrink: 0; }
+    .confid-item-text { flex: 1; line-height: 1.5; }
+    .confid-item-text strong { color: var(--texte); }
+    .confid-item-text span { color: var(--gris); }
+
+    .confid-non { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: var(--radius); padding: 16px; }
+    .confid-oui { background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius); padding: 16px; }
+    .confid-liste-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .confid-liste li {
+      font-size: 13px; color: var(--texte); margin-bottom: 6px;
+      display: flex; gap: 8px; align-items: flex-start; list-style: none;
+    }
+    .confid-rgpd {
+      background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px;
+      padding: 14px; font-size: 12px; color: #1E40AF; line-height: 1.6;
+    }
+
     /* Widget agenda accueil */
     .widget-event {
       background: var(--blanc); border-radius: 12px;
@@ -1036,6 +1203,34 @@
   <button class="btn-continuer" onclick="fermerBatterieOverlay()">Continuer quand même →</button>
 </div>
 
+<!-- BOUTON DANGER DISCRET (floating) -->
+<button class="danger-fab" id="danger-fab" aria-label="Alerte danger discrète" title="Maintenir 3 secondes pour alerter">🚨</button>
+
+<!-- OVERLAY COUNTDOWN DANGER -->
+<div class="danger-overlay" id="danger-overlay">
+  <h2>🚨 ALERTE DANGER</h2>
+  <p>Maintenez appuyé jusqu'à zéro<br>Relâchez pour annuler</p>
+  <div class="danger-ring">
+    <div class="danger-ring-progress" id="danger-ring-progress"></div>
+    <div class="danger-ring-num" id="danger-num">3</div>
+  </div>
+  <button class="danger-annuler" onclick="annulerDanger()">✕ Annuler</button>
+</div>
+
+<!-- OVERLAY APRÈS DÉCLENCHEMENT -->
+<div class="danger-overlay" id="danger-declenche" style="display:none">
+  <div style="font-size:56px">🚨</div>
+  <h2>Alerte envoyée !</h2>
+  <p>La communauté ElanProtect est alertée.<br>Utilisez maintenant :</p>
+  <div class="danger-actions">
+    <a class="danger-action-btn danger-sms" id="danger-sms-btn" href="#">📱 Envoyer SMS de détresse</a>
+    <a class="danger-action-btn danger-tel" href="tel:17">🚔 Appeler Police — 17</a>
+    <a class="danger-action-btn danger-tel" href="tel:15">🚑 Appeler SAMU — 15</a>
+    <a class="danger-action-btn danger-tel" href="tel:18">🔥 Appeler Pompiers — 18</a>
+    <button class="danger-annuler" onclick="fermerDangerDeclenche()">✕ Fermer</button>
+  </div>
+</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-logo" aria-hidden="true">🤝</div>
@@ -1102,6 +1297,16 @@
         <div class="icon">🎁</div>
         <div class="label">Dons & Échanges</div>
         <div class="desc">Téléphone, vêtements, réveil…</div>
+      </div>
+      <div class="quick-card" onclick="goTo('impact')">
+        <div class="icon">💙</div>
+        <div class="label">Notre Impact</div>
+        <div class="desc">Stats en direct, associations</div>
+      </div>
+      <div class="quick-card" onclick="goTo('confidentialite')">
+        <div class="icon">🔒</div>
+        <div class="label">Confidentialité</div>
+        <div class="desc">Anonymat garanti, RGPD</div>
       </div>
     </div>
   </div>
@@ -1790,6 +1995,211 @@
         ✅ Annonce publiée !
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ===== PAGE IMPACT ===== -->
+<div class="page" id="page-impact">
+
+  <div class="impact-hero">
+    <div class="icon">💙</div>
+    <h2>Notre Impact</h2>
+    <p>En temps réel — chaque chiffre représente une personne aidée, une main tendue.</p>
+    <div class="impact-live-badge"><div class="live-dot"></div> Données en direct</div>
+  </div>
+
+  <!-- Connectés en ce moment -->
+  <div class="impact-connectes-banner" style="margin:16px 16px 0">
+    <div class="impact-connectes-num" id="impact-connectes">—</div>
+    <div>
+      <div style="font-weight:800;font-size:15px">personnes connectées</div>
+      <div class="impact-connectes-label">en ce moment sur ElanProtect 🤝</div>
+    </div>
+  </div>
+
+  <!-- Grille de stats -->
+  <div class="impact-grid">
+    <div class="impact-card rouge">
+      <div class="impact-num" id="impact-sig24">—</div>
+      <div class="impact-label">Urgences signalées</div>
+      <div class="impact-sub">dernières 24h</div>
+    </div>
+    <div class="impact-card vert">
+      <div class="impact-num" id="impact-dons">—</div>
+      <div class="impact-label">Dons & échanges</div>
+      <div class="impact-sub">annonces actives</div>
+    </div>
+    <div class="impact-card orange">
+      <div class="impact-num" id="impact-sig-total">—</div>
+      <div class="impact-label">Signalements</div>
+      <div class="impact-sub">depuis le lancement</div>
+    </div>
+    <div class="impact-card violet">
+      <div class="impact-num" id="impact-messages">—</div>
+      <div class="impact-label">Messages tchat</div>
+      <div class="impact-sub">échangés au total</div>
+    </div>
+    <div class="impact-card cyan">
+      <div class="impact-num" id="impact-agenda">—</div>
+      <div class="impact-label">Services référencés</div>
+      <div class="impact-sub">maraudes, repas, distributions</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-num" id="impact-points">—</div>
+      <div class="impact-label">Points d'aide</div>
+      <div class="impact-sub">sur la carte interactive</div>
+    </div>
+    <div class="impact-card full" style="border-top-color:#065F46;background:linear-gradient(135deg,#F0FDF4,#DCFCE7)">
+      <div style="font-size:32px;margin-bottom:6px">🗺️</div>
+      <div class="impact-num" style="color:#065F46" id="impact-villes">11</div>
+      <div class="impact-label" style="color:#065F46">villes couvertes en France</div>
+      <div class="impact-sub">Paris · Lyon · Marseille · Toulouse · Bordeaux · Nice · Nantes · Strasbourg · Lille · Rennes · Montpellier</div>
+    </div>
+  </div>
+
+  <!-- Associations partenaires -->
+  <div class="impact-section">
+    <div class="impact-section-title">🏛️ Associations référencées</div>
+    <div class="impact-asso-card">
+      <div class="impact-asso-icon">🍽️</div>
+      <div class="impact-asso-info">
+        <div class="impact-asso-nom">Les Restos du Cœur</div>
+        <div class="impact-asso-desc">Distribution alimentaire dans toute la France</div>
+      </div>
+      <a class="impact-asso-tel" href="tel:0800130130">0800 130 130</a>
+    </div>
+    <div class="impact-asso-card">
+      <div class="impact-asso-icon">🚑</div>
+      <div class="impact-asso-info">
+        <div class="impact-asso-nom">SAMU Social — 115</div>
+        <div class="impact-asso-desc">Maraudes nocturnes, hébergement d'urgence</div>
+      </div>
+      <a class="impact-asso-tel" href="tel:115">115</a>
+    </div>
+    <div class="impact-asso-card">
+      <div class="impact-asso-icon">❤️</div>
+      <div class="impact-asso-info">
+        <div class="impact-asso-nom">Croix-Rouge Française</div>
+        <div class="impact-asso-desc">Soins, vêtements, aide alimentaire</div>
+      </div>
+      <a class="impact-asso-tel" href="tel:0800858858">0800 858 858</a>
+    </div>
+    <div class="impact-asso-card">
+      <div class="impact-asso-icon">✊</div>
+      <div class="impact-asso-info">
+        <div class="impact-asso-nom">Secours Populaire Français</div>
+        <div class="impact-asso-desc">Aide alimentaire et vestimentaire</div>
+      </div>
+      <a class="impact-asso-tel" href="tel:0144782100">01 44 78 21 00</a>
+    </div>
+    <div class="impact-asso-card">
+      <div class="impact-asso-icon">⭐</div>
+      <div class="impact-asso-info">
+        <div class="impact-asso-nom">Armée du Salut</div>
+        <div class="impact-asso-desc">Repas chauds, hébergement, soutien</div>
+      </div>
+      <a class="impact-asso-tel" href="https://armeedusalut.fr" target="_blank" style="font-size:11px">armeedusalut.fr</a>
+    </div>
+  </div>
+
+  <!-- Message de mission -->
+  <div style="margin:0 16px 20px;background:linear-gradient(135deg,#1E40AF,#7C3AED);border-radius:var(--radius);padding:20px;text-align:center;color:white">
+    <div style="font-size:28px;margin-bottom:8px">🤝</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px">100% Gratuit · Anonyme · Sans inscription</div>
+    <div style="font-size:12px;opacity:0.9;line-height:1.6">ElanProtect est une plateforme indépendante d'entraide. Aucun profit, aucune donnée vendue. Juste des gens qui s'entraident.</div>
+  </div>
+
+</div>
+
+<!-- ===== PAGE CONFIDENTIALITÉ ===== -->
+<div class="page" id="page-confidentialite">
+
+  <div class="confid-hero">
+    <div class="icon">🔒</div>
+    <h2>Confidentialité & Anonymat</h2>
+    <p>Votre vie privée est notre priorité. Voici exactement ce qu'on fait de vos données — et ce qu'on ne fait pas.</p>
+  </div>
+
+  <div class="confid-section">
+
+    <!-- Ce qu'on ne stocke PAS -->
+    <div class="confid-non">
+      <div class="confid-liste-title" style="color:#065F46">✅ Ce que nous ne collectons JAMAIS</div>
+      <ul class="confid-liste">
+        <li><span>🚫</span><span>Votre <strong>nom réel</strong>, prénom, date de naissance</span></li>
+        <li><span>🚫</span><span>Votre <strong>adresse email</strong> ou numéro de téléphone</span></li>
+        <li><span>🚫</span><span>Votre <strong>adresse IP</strong> — elle n'est ni stockée ni tracée</span></li>
+        <li><span>🚫</span><span>Votre <strong>position GPS</strong> — sauf si vous la partagez explicitement dans un signalement (et encore, c'est optionnel)</span></li>
+        <li><span>🚫</span><span>Votre <strong>historique de navigation</strong>, comportement sur l'app, temps de visite</span></li>
+        <li><span>🚫</span><span><strong>Cookies de tracking</strong>, publicité, analytics tiers</span></li>
+        <li><span>🚫</span><span>Votre <strong>identité réelle</strong> dans le tchat — le pseudo est entièrement libre</span></li>
+      </ul>
+    </div>
+
+    <!-- Ce qu'on stocke (anonymement) -->
+    <div class="confid-oui">
+      <div class="confid-liste-title" style="color:#7F1D1D">ℹ️ Ce qui est stocké de façon anonyme</div>
+      <ul class="confid-liste">
+        <li><span>💬</span><span><strong>Messages tchat</strong> : texte + pseudo choisi librement + heure. Pas d'identifiant unique. Supprimés sur demande.</span></li>
+        <li><span>🆘</span><span><strong>Signalements</strong> : type d'urgence + ville + message. Aucun lien avec une identité.</span></li>
+        <li><span>🎁</span><span><strong>Dons/échanges</strong> : titre, description, ville, contact choisi par vous (peut être juste "Tchat Paris").</span></li>
+        <li><span>📅</span><span><strong>Événements agenda</strong> : soumis par associations uniquement, validés par admin.</span></li>
+      </ul>
+    </div>
+
+    <!-- Journal Démarches -->
+    <div class="confid-card">
+      <div class="confid-card-title">📋 Journal des Démarches — 100% local</div>
+      <div class="confid-item">
+        <span class="icon">📱</span>
+        <div class="confid-item-text"><strong>Stocké uniquement sur votre téléphone</strong><span> — dans la mémoire locale (localStorage) de votre navigateur. Rien n'est jamais envoyé à nos serveurs.</span></div>
+      </div>
+      <div class="confid-item">
+        <span class="icon">🔒</span>
+        <div class="confid-item-text"><strong>Personne d'autre ne peut y accéder</strong><span> — ni ElanProtect, ni votre opérateur, ni personne. C'est votre espace privé.</span></div>
+      </div>
+      <div class="confid-item">
+        <span class="icon">⚠️</span>
+        <div class="confid-item-text"><strong>Effacer les données du navigateur</strong><span> efface aussi vos démarches. Notez les informations importantes ailleurs.</span></div>
+      </div>
+    </div>
+
+    <!-- PWA & Service Worker -->
+    <div class="confid-card">
+      <div class="confid-card-title">📦 Application & Mise en cache</div>
+      <div class="confid-item">
+        <span class="icon">⚡</span>
+        <div class="confid-item-text"><strong>Service Worker</strong><span> : l'app peut fonctionner sans connexion en mettant certaines pages en cache local. Aucune donnée personnelle n'est mise en cache.</span></div>
+      </div>
+      <div class="confid-item">
+        <span class="icon">🌐</span>
+        <div class="confid-item-text"><strong>Météo & Traduction</strong><span> : si vous activez ces fonctionnalités, des appels sont faits vers Open-Meteo (météo) et MyMemory (traduction) — deux services sans tracking. Votre IP leur est visible le temps de la requête.</span></div>
+      </div>
+    </div>
+
+    <!-- RGPD -->
+    <div class="confid-rgpd">
+      <strong>🇪🇺 Conformité RGPD</strong><br>
+      ElanProtect ne collecte aucune donnée à caractère personnel au sens du RGPD. Aucune inscription, aucun compte, aucun profil. Vous êtes toujours anonyme. Aucun transfert de données vers des pays tiers. Aucune base de données de profils utilisateurs.
+    </div>
+
+    <!-- Contact -->
+    <div class="confid-card">
+      <div class="confid-card-title">📨 Une question ?</div>
+      <div class="confid-item">
+        <span class="icon">💬</span>
+        <div class="confid-item-text"><strong>Utilisez le tchat ElanProtect</strong><span> ou contactez-nous sur le salon "Général". Nous répondons sous 48h.</span></div>
+      </div>
+      <div class="confid-item">
+        <span class="icon">🔍</span>
+        <div class="confid-item-text"><strong>Code source</strong><span> : ce projet est ouvert et consultable. Vous pouvez vérifier vous-même ce que fait l'application.</span></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--gris);padding:8px">
+      Dernière mise à jour : mai 2026 — ElanProtect v1.0
+    </div>
+
   </div>
 </div>
 
@@ -2760,6 +3170,7 @@ goTo = function(page) {
   if (page === 'tchat' && !tchatInitialise) initTchat();
   if (page === 'dons') chargerDons();
   if (page === 'agenda') chargerAgenda();
+  if (page === 'impact') chargerImpact();
   if (page === 'demarches') { switchDemarcheTab('liste'); }
   if (page === 'guide') {
     document.getElementById('guide-plan-screen').style.display = 'none';
@@ -3091,6 +3502,140 @@ async function soumettreAgenda() {
 
 // Charger agenda au démarrage pour avoir les stats
 chargerAgenda();
+
+// ===== BOUTON DANGER DISCRET =====
+let dangerTimer = null;
+let dangerCountdown = null;
+let dangerLat = null;
+let dangerLng = null;
+let dangerStartTime = null;
+const DANGER_DURATION = 3000; // 3 secondes
+
+const dangerFab = document.getElementById('danger-fab');
+
+function startDanger(e) {
+  e.preventDefault();
+  dangerStartTime = Date.now();
+  document.getElementById('danger-overlay').classList.add('visible');
+  document.getElementById('danger-num').textContent = '3';
+  document.getElementById('danger-ring-progress').style.background = 'conic-gradient(white 0deg, transparent 0deg)';
+
+  // Récupérer GPS en avance
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      dangerLat = pos.coords.latitude;
+      dangerLng = pos.coords.longitude;
+    }, () => {}, { timeout: 5000 });
+  }
+
+  let remaining = 3;
+  dangerCountdown = setInterval(() => {
+    const elapsed = Date.now() - dangerStartTime;
+    const pct = Math.min(elapsed / DANGER_DURATION, 1);
+    const deg = Math.round(pct * 360);
+    document.getElementById('danger-ring-progress').style.background =
+      `conic-gradient(white ${deg}deg, transparent ${deg}deg)`;
+    const num = Math.ceil(3 - pct * 3);
+    document.getElementById('danger-num').textContent = num <= 0 ? '0' : num;
+    if (pct >= 1) declencherDanger();
+  }, 50);
+}
+
+function stopDanger() {
+  if (dangerCountdown) { clearInterval(dangerCountdown); dangerCountdown = null; }
+  document.getElementById('danger-overlay').classList.remove('visible');
+  dangerStartTime = null;
+}
+
+function annulerDanger() { stopDanger(); }
+
+function declencherDanger() {
+  stopDanger();
+
+  // Construire le SMS
+  const gpsStr = (dangerLat && dangerLng)
+    ? `Position GPS : https://maps.google.com/?q=${dangerLat.toFixed(5)},${dangerLng.toFixed(5)}`
+    : 'Position GPS non disponible';
+  const smsBody = encodeURIComponent(`🆘 URGENT — J'ai besoin d'aide. ${gpsStr} — Envoyé depuis ElanProtect`);
+  const smsHref = `sms:17?&body=${smsBody}`;
+  document.getElementById('danger-sms-btn').href = `sms:?&body=${smsBody}`;
+
+  // Afficher l'écran de déclenchement
+  document.getElementById('danger-declenche').style.display = 'flex';
+
+  // Envoyer alerte WebSocket
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'alerte_danger', lat: dangerLat, lng: dangerLng }));
+  }
+}
+
+function fermerDangerDeclenche() {
+  document.getElementById('danger-declenche').style.display = 'none';
+}
+
+// Événements touch (mobile)
+dangerFab.addEventListener('touchstart', startDanger, { passive: false });
+dangerFab.addEventListener('touchend', () => { if (dangerStartTime) stopDanger(); });
+dangerFab.addEventListener('touchcancel', () => { if (dangerStartTime) stopDanger(); });
+// Événements souris (desktop test)
+dangerFab.addEventListener('mousedown', startDanger);
+dangerFab.addEventListener('mouseup', () => { if (dangerStartTime) stopDanger(); });
+dangerFab.addEventListener('mouseleave', () => { if (dangerStartTime) stopDanger(); });
+
+// Gérer alerte danger reçue via WebSocket (montrer à tous)
+const _origHandleWs = handleWsMessage;
+function handleWsMessage(e) {
+  try {
+    const data = JSON.parse(e.data);
+    if (data.type === 'alerte_danger') {
+      const el = document.getElementById('alerte-signalement');
+      el.style.background = 'var(--rouge)';
+      el.textContent = '🚨 ALERTE DANGER — Une personne a besoin d\'aide maintenant !';
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 8000);
+    }
+  } catch {}
+  _origHandleWs(e);
+}
+
+// ===== PAGE IMPACT =====
+async function chargerImpact() {
+  try {
+    const res = await fetch('/api/impact');
+    const d = await res.json();
+    animerNombre('impact-connectes', d.connectes);
+    animerNombre('impact-sig24', d.signalements24h);
+    animerNombre('impact-dons', d.donsTotal);
+    animerNombre('impact-sig-total', d.signalementsTotal);
+    animerNombre('impact-messages', d.messagesTotal);
+    animerNombre('impact-agenda', d.agendaTotal);
+    animerNombre('impact-points', d.points);
+    // Refresh connectés toutes les 10s si page ouverte
+    if (pageActive === 'impact') setTimeout(chargerImpact, 10000);
+  } catch {
+    ['impact-connectes','impact-sig24','impact-dons','impact-sig-total',
+     'impact-messages','impact-agenda','impact-points'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.textContent === '—') el.textContent = '…';
+    });
+  }
+}
+
+function animerNombre(id, cible) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (cible === null || cible === undefined) { el.textContent = '—'; return; }
+  const start = parseInt(el.textContent) || 0;
+  const dur = 800;
+  const startTime = performance.now();
+  function step(now) {
+    const p = Math.min((now - startTime) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(start + (cible - start) * ease);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 // Widget accueil : 3 prochains événements
 async function chargerWidgetAgenda() {
