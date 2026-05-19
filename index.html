@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>MainTendue - Entraide Sociale</title>
+  <meta name="description" content="Plateforme d'entraide pour les personnes sans-abri et en difficulté. Carte des ressources, tchat communautaire, signalement urgent.">
+  <meta name="theme-color" content="#1E40AF">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192.png">
+  <!-- Leaflet pour la carte -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bleu: #1E40AF;
+      --bleu-clair: #3B82F6;
+      --orange: #F97316;
+      --vert: #16A34A;
+      --rouge: #DC2626;
+      --fond: #F0F4FF;
+      --blanc: #ffffff;
+      --texte: #1E293B;
+      --gris: #64748B;
+      --gris-clair: #E2E8F0;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(30,64,175,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--fond);
+      color: var(--texte);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--bleu);
+      color: white;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .header-logo { font-size: 26px; }
+    .header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .header-sub { font-size: 11px; opacity: 0.8; }
+    .header-sos {
+      margin-left: auto;
+      background: var(--rouge);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      animation: pulse-sos 2s infinite;
+    }
+    @keyframes pulse-sos {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* PAGES */
+    .page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .page.active { display: flex; }
+
+    /* NAV BAS */
+    .bottom-nav {
+      background: var(--blanc);
+      border-top: 1px solid var(--gris-clair);
+      display: flex;
+      position: sticky;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gris);
+      font-size: 10px;
+      font-weight: 500;
+      gap: 2px;
+      transition: color 0.2s;
+    }
+    .nav-btn .icon { font-size: 22px; }
+    .nav-btn.active { color: var(--bleu); }
+    .nav-btn.active .icon { transform: scale(1.1); }
+
+    /* ========== PAGE ACCUEIL ========== */
+    #page-accueil {
+      overflow-y: auto;
+      padding: 20px 16px;
+      gap: 16px;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--bleu), var(--bleu-clair));
+      color: white;
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .hero-emoji { font-size: 48px; margin-bottom: 12px; }
+    .hero h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .hero p { font-size: 14px; opacity: 0.9; line-height: 1.5; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 16px 10px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-number { font-size: 24px; font-weight: 800; color: var(--bleu); }
+    .stat-label { font-size: 11px; color: var(--gris); margin-top: 2px; }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--texte);
+      margin-bottom: 4px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .quick-card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .quick-card:hover { border-color: var(--bleu-clair); transform: translateY(-2px); }
+    .quick-card .icon { font-size: 32px; }
+    .quick-card .label { font-size: 13px; font-weight: 600; color: var(--texte); text-align: center; }
+    .quick-card .desc { font-size: 11px; color: var(--gris); text-align: center; }
+
+    .urgence-banner {
+      background: linear-gradient(135deg, #FEF2F2, #FECACA);
+      border: 2px solid var(--rouge);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+    .urgence-banner .icon { font-size: 36px; }
+    .urgence-banner h3 { font-size: 15px; font-weight: 700; color: var(--rouge); }
+    .urgence-banner p { font-size: 12px; color: #7F1D1D; margin-top: 2px; }
+
+    .numeros-utiles {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .numero-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gris-clair);
+      gap: 12px;
+    }
+    .numero-item:last-child { border-bottom: none; }
+    .numero-icon { font-size: 24px; }
+    .numero-info { flex: 1; }
+    .numero-nom { font-size: 13px; font-weight: 600; }
+    .numero-desc { font-size: 11px; color: var(--gris); }
+    .numero-tel {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--bleu);
+      text-decoration: none;
+    }
+
+    /* ========== PAGE CARTE ========== */
+    #page-carte { position: relative; }
+    #map { flex: 1; width: 100%; min-height: 400px; }
+
+    .carte-filtres {
+      background: var(--blanc);
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--gris-clair);
+    }
+    .filtre-btn {
+      background: var(--gris-clair);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .filtre-btn.active {
+      background: var(--bleu);
+      color: white;
+    }
+
+    .carte-legende {
+      background: var(--blanc);
+      padding: 10px 16px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--gris-clair);
+    }
+    .legende-item { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+    .legende-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* ========== PAGE TCHAT ========== */
+    #page-tchat { overflow: hidden; }
+
+    .salons-bar {
+      background: var(--blanc);
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--gris-clair);
+    }
+    .salon-btn {
+      background: var(--gris-clair);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .salon-btn.active { background: var(--bleu); color: white; }
+
+    .messages-zone {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--fond);
+    }
+
+    .msg-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+      position: relative;
+    }
+    .msg-bubble.autre {
+      background: var(--blanc);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .msg-bubble.moi {
+      background: var(--bleu);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-pseudo {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--bleu);
+      margin-bottom: 3px;
+    }
+    .msg-bubble.moi .msg-pseudo { color: rgba(255,255,255,0.8); }
+    .msg-time { font-size: 10px; opacity: 0.6; margin-top: 4px; }
+
+    .msg-signalement {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      align-self: center;
+      text-align: center;
+      color: var(--rouge);
+      font-weight: 600;
+    }
+
+    .tchat-input-zone {
+      background: var(--blanc);
+      padding: 12px 16px;
+      border-top: 1px solid var(--gris-clair);
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .pseudo-field {
+      width: 90px;
+      padding: 10px 12px;
+      border: 1px solid var(--gris-clair);
+      border-radius: 20px;
+      font-size: 13px;
+      outline: none;
+      flex-shrink: 0;
+    }
+    .msg-field {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--gris-clair);
+      border-radius: 20px;
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      max-height: 100px;
+      font-family: inherit;
+    }
+    .msg-field:focus, .pseudo-field:focus { border-color: var(--bleu); }
+    .send-btn {
+      background: var(--bleu);
+      color: white;
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .send-btn:hover { background: var(--bleu-clair); }
+
+    /* ========== PAGE SIGNALEMENT ========== */
+    #page-signalement { overflow-y: auto; padding: 20px 16px; gap: 16px; }
+
+    .signalement-hero {
+      background: linear-gradient(135deg, #FEF2F2, #FECACA);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .signalement-hero .icon { font-size: 52px; }
+    .signalement-hero h2 { font-size: 20px; font-weight: 700; color: var(--rouge); margin: 8px 0; }
+    .signalement-hero p { font-size: 13px; color: #7F1D1D; line-height: 1.5; }
+
+    .types-urgence {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .urgence-type {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      border: 3px solid transparent;
+      box-shadow: var(--shadow);
+      transition: all 0.2s;
+    }
+    .urgence-type:hover { transform: translateY(-2px); }
+    .urgence-type.selected { border-color: var(--rouge); background: #FEF2F2; }
+    .urgence-type .icon { font-size: 36px; margin-bottom: 8px; }
+    .urgence-type .label { font-size: 13px; font-weight: 700; }
+    .urgence-type .desc { font-size: 11px; color: var(--gris); margin-top: 4px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-label { font-size: 14px; font-weight: 600; }
+    .form-input, .form-select, .form-textarea {
+      padding: 12px 16px;
+      border: 2px solid var(--gris-clair);
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--blanc);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--bleu); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+
+    .btn-signaler {
+      background: var(--rouge);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: opacity 0.2s;
+    }
+    .btn-signaler:hover { opacity: 0.9; }
+
+    .signalement-ok {
+      display: none;
+      background: #F0FDF4;
+      border: 2px solid var(--vert);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .signalement-ok .icon { font-size: 48px; }
+    .signalement-ok h3 { font-size: 18px; font-weight: 700; color: var(--vert); margin: 8px 0; }
+    .signalement-ok p { font-size: 13px; color: #166534; }
+
+    /* ========== PAGE RESSOURCES ========== */
+    #page-ressources { overflow-y: auto; padding: 20px 16px; gap: 16px; }
+
+    .ressource-card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .ressource-icon { font-size: 32px; flex-shrink: 0; }
+    .ressource-info { flex: 1; }
+    .ressource-titre { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .ressource-desc { font-size: 13px; color: var(--gris); line-height: 1.5; }
+    .ressource-liens { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .ressource-lien {
+      background: var(--fond);
+      border: 1px solid var(--gris-clair);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--bleu);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .parcours-etapes {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .etape {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gris-clair);
+    }
+    .etape:last-child { border-bottom: none; }
+    .etape-num {
+      width: 32px;
+      height: 32px;
+      background: var(--bleu);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .etape-info { flex: 1; }
+    .etape-titre { font-size: 14px; font-weight: 700; }
+    .etape-desc { font-size: 12px; color: var(--gris); margin-top: 2px; }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--texte);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+      white-space: nowrap;
+      max-width: 90vw;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Alerte signalement reçu */
+    .alerte-signalement {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--rouge);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      display: none;
+      z-index: 998;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gris-clair); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">🤝</div>
+  <div>
+    <div class="header-title">MainTendue</div>
+    <div class="header-sub">Entraide solidaire</div>
+  </div>
+  <button class="header-sos" onclick="goTo('signalement')">🆘 SOS</button>
+</div>
+
+<!-- ALERTE SIGNALEMENT -->
+<div class="alerte-signalement" id="alerte-signalement"></div>
+
+<!-- ===== PAGE ACCUEIL ===== -->
+<div class="page active" id="page-accueil">
+  <div class="hero">
+    <div class="hero-emoji">🤝</div>
+    <h2>Ensemble, on est plus forts</h2>
+    <p>Trouvez de l'aide près de chez vous, signalez une urgence, échangez avec la communauté.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number" id="stat-points">8</div>
+      <div class="stat-label">Points d'aide</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-connectes">—</div>
+      <div class="stat-label">Connectés</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-signalements">0</div>
+      <div class="stat-label">Urgences 24h</div>
+    </div>
+  </div>
+
+  <div class="urgence-banner" onclick="goTo('signalement')">
+    <div class="icon">🆘</div>
+    <div>
+      <h3>Signaler une urgence</h3>
+      <p>Froid, faim, danger, besoin médical — signalez en 30 secondes</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Accès rapide</div>
+    <div class="quick-actions" style="margin-top: 10px;">
+      <div class="quick-card" onclick="goTo('carte')">
+        <div class="icon">🗺️</div>
+        <div class="label">Carte d'aide</div>
+        <div class="desc">Repas, douches, hébergement, wifi</div>
+      </div>
+      <div class="quick-card" onclick="goTo('tchat')">
+        <div class="icon">💬</div>
+        <div class="label">Communauté</div>
+        <div class="desc">Tchat par ville et par thème</div>
+      </div>
+      <div class="quick-card" onclick="goTo('ressources')">
+        <div class="icon">📋</div>
+        <div class="label">Ressources</div>
+        <div class="desc">Démarches, droits, parcours</div>
+      </div>
+      <div class="quick-card" onclick="callTel('115')">
+        <div class="icon">📞</div>
+        <div class="label">115 Urgence</div>
+        <div class="desc">Hébergement d'urgence gratuit</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Numéros d'urgence</div>
+    <div class="numeros-utiles" style="margin-top: 10px;">
+      <div class="numero-item">
+        <div class="numero-icon">🏠</div>
+        <div class="numero-info">
+          <div class="numero-nom">SAMU Social</div>
+          <div class="numero-desc">Hébergement d'urgence 24h/24</div>
+        </div>
+        <a class="numero-tel" href="tel:115">115</a>
+      </div>
+      <div class="numero-item">
+        <div class="numero-icon">🚑</div>
+        <div class="numero-info">
+          <div class="numero-nom">SAMU</div>
+          <div class="numero-desc">Urgence médicale</div>
+        </div>
+        <a class="numero-tel" href="tel:15">15</a>
+      </div>
+      <div class="numero-item">
+        <div class="numero-icon">🚔</div>
+        <div class="numero-info">
+          <div class="numero-nom">Police</div>
+          <div class="numero-desc">Urgence sécurité</div>
+        </div>
+        <a class="numero-tel" href="tel:17">17</a>
+      </div>
+      <div class="numero-item">
+        <div class="numero-icon">🔥</div>
+        <div class="numero-info">
+          <div class="numero-nom">Pompiers</div>
+          <div class="numero-desc">Incendie, accident</div>
+        </div>
+        <a class="numero-tel" href="tel:18">18</a>
+      </div>
+      <div class="numero-item">
+        <div class="numero-icon">💙</div>
+        <div class="numero-info">
+          <div class="numero-nom">Croix-Rouge Écoute</div>
+          <div class="numero-desc">Soutien moral, détresse</div>
+        </div>
+        <a class="numero-tel" href="tel:0800858858">0800 858 858</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE CARTE ===== -->
+<div class="page" id="page-carte">
+  <div class="carte-filtres">
+    <button class="filtre-btn active" data-type="all" onclick="filtrerCarte(this, 'all')">🗺️ Tout</button>
+    <button class="filtre-btn" data-type="repas" onclick="filtrerCarte(this, 'repas')">🍽️ Repas</button>
+    <button class="filtre-btn" data-type="hebergement" onclick="filtrerCarte(this, 'hebergement')">🏠 Hébergement</button>
+    <button class="filtre-btn" data-type="douche" onclick="filtrerCarte(this, 'douche')">🚿 Douches</button>
+    <button class="filtre-btn" data-type="wifi" onclick="filtrerCarte(this, 'wifi')">📶 Wifi</button>
+  </div>
+  <div id="map"></div>
+  <div class="carte-legende">
+    <div class="legende-item"><div class="legende-dot" style="background:#F97316"></div> Repas</div>
+    <div class="legende-item"><div class="legende-dot" style="background:#1E40AF"></div> Hébergement</div>
+    <div class="legende-item"><div class="legende-dot" style="background:#06B6D4"></div> Douches</div>
+    <div class="legende-item"><div class="legende-dot" style="background:#16A34A"></div> Wifi</div>
+  </div>
+</div>
+
+<!-- ===== PAGE TCHAT ===== -->
+<div class="page" id="page-tchat">
+  <div class="salons-bar">
+    <button class="salon-btn active" onclick="changerSalon(this, 'Paris')">🗼 Paris</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Lyon')">🦁 Lyon</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Marseille')">⛵ Marseille</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Urgence')">🆘 Urgence</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Repas')">🍽️ Repas</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Hebergement')">🏠 Hébergement</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Emploi')">💼 Emploi</button>
+    <button class="salon-btn" onclick="changerSalon(this, 'Benevolat')">💚 Bénévolat</button>
+  </div>
+
+  <div class="messages-zone" id="messages-zone">
+    <div style="text-align:center; color:var(--gris); font-size:13px; padding:20px;">
+      Bienvenue dans le salon <strong id="salon-actuel-label">Paris</strong> 👋<br>
+      Vous êtes anonyme. Pas d'inscription nécessaire.
+    </div>
+  </div>
+
+  <div class="tchat-input-zone">
+    <input class="pseudo-field" id="pseudo-input" type="text" placeholder="Pseudo" maxlength="20" value="Anonyme">
+    <textarea class="msg-field" id="msg-input" placeholder="Votre message..." rows="1" maxlength="500"></textarea>
+    <button class="send-btn" onclick="envoyerMessage()">➤</button>
+  </div>
+</div>
+
+<!-- ===== PAGE SIGNALEMENT ===== -->
+<div class="page" id="page-signalement">
+  <div class="signalement-hero">
+    <div class="icon">🆘</div>
+    <h2>Signalement d'urgence</h2>
+    <p>Signalez rapidement une situation d'urgence. Bénévoles et associations seront alertés.</p>
+  </div>
+
+  <div>
+    <div class="section-title">Type d'urgence</div>
+    <div class="types-urgence" style="margin-top: 10px;">
+      <div class="urgence-type" onclick="selectionnerType(this, 'froid')" data-type="froid">
+        <div class="icon">🥶</div>
+        <div class="label">Grand froid</div>
+        <div class="desc">Personne exposée au froid</div>
+      </div>
+      <div class="urgence-type" onclick="selectionnerType(this, 'faim')" data-type="faim">
+        <div class="icon">🍞</div>
+        <div class="label">Faim / Soif</div>
+        <div class="desc">Besoin alimentaire urgent</div>
+      </div>
+      <div class="urgence-type" onclick="selectionnerType(this, 'medical')" data-type="medical">
+        <div class="icon">🏥</div>
+        <div class="label">Médical</div>
+        <div class="desc">Besoin de soins (non critique)</div>
+      </div>
+      <div class="urgence-type" onclick="selectionnerType(this, 'danger')" data-type="danger">
+        <div class="icon">⚠️</div>
+        <div class="label">Danger</div>
+        <div class="desc">Personne en situation de danger</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Ville</label>
+    <select class="form-select" id="signalement-ville">
+      <option value="Paris">Paris</option>
+      <option value="Lyon">Lyon</option>
+      <option value="Marseille">Marseille</option>
+      <option value="Autre">Autre ville</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Précisions (optionnel)</label>
+    <textarea class="form-textarea" id="signalement-message" placeholder="Adresse, situation, informations utiles..." maxlength="500"></textarea>
+  </div>
+
+  <button class="btn-signaler" onclick="envoyerSignalement()">
+    🆘 Envoyer le signalement
+  </button>
+
+  <div class="signalement-ok" id="signalement-ok">
+    <div class="icon">✅</div>
+    <h3>Signalement envoyé !</h3>
+    <p>Les bénévoles et associations de votre ville ont été alertés. Merci pour votre solidarité.</p>
+  </div>
+
+  <div style="background:var(--blanc); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow);">
+    <div style="font-size:13px; font-weight:700; margin-bottom:10px;">⚡ Urgence vitale ? Appelez directement :</div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="tel:15" style="background:var(--rouge); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">15 SAMU</a>
+      <a href="tel:17" style="background:var(--bleu); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">17 Police</a>
+      <a href="tel:18" style="background:var(--orange); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">18 Pompiers</a>
+      <a href="tel:115" style="background:var(--vert); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">115 Héberg.</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE RESSOURCES ===== -->
+<div class="page" id="page-ressources">
+  <div class="section-title" style="padding: 16px 16px 0;">Parcours de reconstruction</div>
+  <div class="parcours-etapes" style="margin: 8px 16px 0;">
+    <div class="etape">
+      <div class="etape-num">1</div>
+      <div class="etape-info">
+        <div class="etape-titre">🏠 Hébergement d'urgence</div>
+        <div class="etape-desc">Appeler le 115 — gratuit, 24h/24. Droit à l'hébergement inconditionnel.</div>
+      </div>
+    </div>
+    <div class="etape">
+      <div class="etape-num">2</div>
+      <div class="etape-info">
+        <div class="etape-titre">📋 Domiciliation</div>
+        <div class="etape-desc">S'inscrire dans un CCAS ou association agréée pour avoir une adresse postale officielle.</div>
+      </div>
+    </div>
+    <div class="etape">
+      <div class="etape-num">3</div>
+      <div class="etape-info">
+        <div class="etape-titre">🏥 Santé</div>
+        <div class="etape-desc">Ouvrir droits AME ou CSS. Consultation gratuite dans les PASS (Permanences d'Accès aux Soins).</div>
+      </div>
+    </div>
+    <div class="etape">
+      <div class="etape-num">4</div>
+      <div class="etape-info">
+        <div class="etape-titre">📄 Papiers d'identité</div>
+        <div class="etape-desc">Renouveler CNI, passeport via la mairie. Des travailleurs sociaux peuvent aider.</div>
+      </div>
+    </div>
+    <div class="etape">
+      <div class="etape-num">5</div>
+      <div class="etape-info">
+        <div class="etape-titre">💼 Emploi & Formation</div>
+        <div class="etape-desc">S'inscrire à France Travail. Accéder aux chantiers d'insertion et IAE.</div>
+      </div>
+    </div>
+    <div class="etape">
+      <div class="etape-num">6</div>
+      <div class="etape-info">
+        <div class="etape-titre">🏡 Logement durable</div>
+        <div class="etape-desc">Faire une demande HLM via Mon Dossier HLM. Structures CHRS pour accompagnement.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="padding: 16px 16px 8px;">Ressources utiles</div>
+
+  <div class="ressource-card" style="margin: 0 16px;">
+    <div class="ressource-icon">🍽️</div>
+    <div class="ressource-info">
+      <div class="ressource-titre">Aide alimentaire</div>
+      <div class="ressource-desc">Les Restos du Cœur, Banques Alimentaires, Épiceries solidaires.</div>
+      <div class="ressource-liens">
+        <span class="ressource-lien" onclick="toast('Appelez le 115 pour être orienté')">📞 115</span>
+        <span class="ressource-lien" onclick="toast('Site: restosducoeur.org')">Restos du Cœur</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ressource-card" style="margin: 0 16px;">
+    <div class="ressource-icon">⚖️</div>
+    <div class="ressource-info">
+      <div class="ressource-titre">Aide juridique</div>
+      <div class="ressource-desc">Accès gratuit à des conseils juridiques via les Maisons de Justice et du Droit.</div>
+      <div class="ressource-liens">
+        <span class="ressource-lien" onclick="toast('Contactez votre mairie pour trouver la MJD la plus proche')">Trouver une MJD</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ressource-card" style="margin: 0 16px;">
+    <div class="ressource-icon">💆</div>
+    <div class="ressource-info">
+      <div class="ressource-titre">Soutien psychologique</div>
+      <div class="ressource-desc">Croix-Rouge Écoute : 0800 858 858 (gratuit). Soutien moral 24h/24.</div>
+      <div class="ressource-liens">
+        <span class="ressource-lien" onclick="callTel('0800858858')">📞 0800 858 858</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ressource-card" style="margin: 0 16px 20px;">
+    <div class="ressource-icon">📱</div>
+    <div class="ressource-info">
+      <div class="ressource-titre">Accès numérique</div>
+      <div class="ressource-desc">Espaces publics numériques (EPN) pour utiliser un ordinateur gratuitement. WiFi dans les bibliothèques.</div>
+      <div class="ressource-liens">
+        <span class="ressource-lien" onclick="toast('Demandez à la mairie la liste des EPN de votre ville')">Trouver un EPN</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV BAS -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-accueil" onclick="goTo('accueil')">
+    <span class="icon">🏠</span>Accueil
+  </button>
+  <button class="nav-btn" id="nav-carte" onclick="goTo('carte')">
+    <span class="icon">🗺️</span>Carte
+  </button>
+  <button class="nav-btn" id="nav-tchat" onclick="goTo('tchat')">
+    <span class="icon">💬</span>Tchat
+  </button>
+  <button class="nav-btn" id="nav-signalement" onclick="goTo('signalement')">
+    <span class="icon">🆘</span>Urgence
+  </button>
+  <button class="nav-btn" id="nav-ressources" onclick="goTo('ressources')">
+    <span class="icon">📋</span>Ressources
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== NAVIGATION =====
+let pageActive = 'accueil';
+let carteInitialisee = false;
+let tchatInitialise = false;
+
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  pageActive = page;
+  if (page === 'carte' && !carteInitialisee) initCarte();
+  if (page === 'tchat' && !tchatInitialise) initTchat();
+}
+
+function callTel(numero) {
+  window.location.href = 'tel:' + numero;
+}
+
+// ===== TOAST =====
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 3000);
+}
+
+// ===== WEBSOCKET =====
+let ws;
+let salonActuel = 'Paris';
+let pseudoLocal = 'Anonyme';
+
+function initWS() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}`);
+
+  ws.onopen = () => {
+    joinSalon(salonActuel);
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      if (data.type === 'history') {
+        const zone = document.getElementById('messages-zone');
+        zone.innerHTML = `<div style="text-align:center;color:var(--gris);font-size:12px;padding:8px">
+          Salon <strong>${salonActuel}</strong> — Anonyme, sans inscription 👋</div>`;
+        data.messages.forEach(m => afficherMessage(m));
+        zone.scrollTop = zone.scrollHeight;
+      }
+      if (data.type === 'message') {
+        afficherMessage(data.msg);
+        const zone = document.getElementById('messages-zone');
+        zone.scrollTop = zone.scrollHeight;
+      }
+      if (data.type === 'signalement') {
+        const s = data.signalement;
+        const emojis = { froid: '🥶', faim: '🍞', medical: '🏥', danger: '⚠️' };
+        const emoji = emojis[s.type] || '🆘';
+        showAlerteSignalement(`${emoji} Urgence signalée : ${s.type} — ${s.ville}`);
+        // Afficher dans le tchat urgence si actif
+        if (salonActuel === 'Urgence') {
+          const zone = document.getElementById('messages-zone');
+          const div = document.createElement('div');
+          div.className = 'msg-signalement';
+          div.textContent = `${emoji} SIGNALEMENT : ${s.type} — ${s.ville}`;
+          zone.appendChild(div);
+          zone.scrollTop = zone.scrollHeight;
+        }
+      }
+    } catch(e) {}
+  };
+
+  ws.onclose = () => {
+    setTimeout(initWS, 3000);
+  };
+}
+
+function joinSalon(salon) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'join', salon, pseudo: pseudoLocal }));
+  }
+}
+
+function afficherMessage(msg) {
+  const zone = document.getElementById('messages-zone');
+  const estMoi = msg.pseudo === pseudoLocal;
+  const div = document.createElement('div');
+  div.className = 'msg-bubble ' + (estMoi ? 'moi' : 'autre');
+  const heure = new Date(msg.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  div.innerHTML = `<div class="msg-pseudo">${msg.pseudo}</div>${msg.texte}<div class="msg-time">${heure}</div>`;
+  zone.appendChild(div);
+}
+
+function showAlerteSignalement(texte) {
+  const el = document.getElementById('alerte-signalement');
+  el.textContent = texte;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function initTchat() {
+  tchatInitialise = true;
+  initWS();
+  document.getElementById('msg-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      envoyerMessage();
+    }
+  });
+}
+
+function changerSalon(btn, salon) {
+  document.querySelectorAll('.salon-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  salonActuel = salon;
+  document.getElementById('salon-actuel-label').textContent = salon;
+  document.getElementById('messages-zone').innerHTML = `<div style="text-align:center;color:var(--gris);font-size:13px;padding:20px">Chargement du salon <strong>${salon}</strong>...</div>`;
+  joinSalon(salon);
+}
+
+function envoyerMessage() {
+  const msgEl = document.getElementById('msg-input');
+  const pseudoEl = document.getElementById('pseudo-input');
+  const texte = msgEl.value.trim();
+  if (!texte) return;
+  pseudoLocal = pseudoEl.value.trim() || 'Anonyme';
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'message', texte }));
+    msgEl.value = '';
+  } else {
+    toast('Connexion en cours...');
+  }
+}
+
+// ===== CARTE =====
+let map;
+let markers = [];
+let typeFiltre = 'all';
+
+const couleurs = {
+  repas: '#F97316',
+  hebergement: '#1E40AF',
+  douche: '#06B6D4',
+  wifi: '#16A34A',
+  recharge: '#8B5CF6',
+};
+
+const icones = {
+  repas: '🍽️',
+  hebergement: '🏠',
+  douche: '🚿',
+  wifi: '📶',
+  recharge: '🔌',
+};
+
+function initCarte() {
+  carteInitialisee = true;
+  map = L.map('map').setView([46.6034, 1.8883], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18
+  }).addTo(map);
+  chargerPoints();
+
+  // Géolocalisation
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      map.setView([latitude, longitude], 13);
+      L.circleMarker([latitude, longitude], {
+        radius: 10, fillColor: '#3B82F6', color: '#fff',
+        fillOpacity: 1, weight: 2
+      }).addTo(map).bindPopup('📍 Vous êtes ici');
+    });
+  }
+}
+
+async function chargerPoints(type) {
+  const url = type && type !== 'all' ? `/api/points?type=${type}` : '/api/points';
+  const res = await fetch(url);
+  const points = await res.json();
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+  points.forEach(p => {
+    const couleur = couleurs[p.type] || '#64748B';
+    const icone = icones[p.type] || '📍';
+    const icon = L.divIcon({
+      html: `<div style="background:${couleur};color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">${icone}</div>`,
+      className: '',
+      iconSize: [36, 36],
+      iconAnchor: [18, 18]
+    });
+    const m = L.marker([p.lat, p.lng], { icon })
+      .bindPopup(`<b>${p.nom}</b><br>${p.adresse}<br><small>${p.horaires}</small>`)
+      .addTo(map);
+    markers.push(m);
+  });
+  document.getElementById('stat-points').textContent = points.length;
+}
+
+function filtrerCarte(btn, type) {
+  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  chargerPoints(type);
+}
+
+// ===== SIGNALEMENT =====
+let typeUrgence = null;
+
+function selectionnerType(el, type) {
+  document.querySelectorAll('.urgence-type').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  typeUrgence = type;
+}
+
+async function envoyerSignalement() {
+  if (!typeUrgence) {
+    toast('Sélectionnez un type d\'urgence');
+    return;
+  }
+  const ville = document.getElementById('signalement-ville').value;
+  const message = document.getElementById('signalement-message').value;
+  try {
+    const res = await fetch('/api/signalement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: typeUrgence, ville, message })
+    });
+    if (res.ok) {
+      document.getElementById('signalement-ok').style.display = 'block';
+      document.getElementById('signalement-ok').scrollIntoView({ behavior: 'smooth' });
+      typeUrgence = null;
+      document.querySelectorAll('.urgence-type').forEach(e => e.classList.remove('selected'));
+      document.getElementById('signalement-message').value = '';
+      document.getElementById('stat-signalements').textContent =
+        parseInt(document.getElementById('stat-signalements').textContent || 0) + 1;
+      setTimeout(() => document.getElementById('signalement-ok').style.display = 'none', 5000);
+    }
+  } catch(e) {
+    toast('Erreur réseau. Appelez le 115.');
+  }
+}
+
+// Mise à jour nombre de connectés
+setInterval(() => {
+  // Sera géré côté serveur plus tard
+}, 30000);
+</script>
+</body>
+</html>
