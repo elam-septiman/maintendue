@@ -185,6 +185,7 @@
     <div class="nav-item" onclick="showSection('moderation')"><span class="icon">🛡️</span><span>Modération</span><span class="badge" id="badge-moderation">0</span></div>
     <div class="nav-item" onclick="showSection('carte')"><span class="icon">🗺️</span><span>Carte / Points</span></div>
     <div class="nav-item" onclick="showSection('dons')"><span class="icon">🎁</span><span>Dons</span></div>
+    <div class="nav-item" onclick="showSection('agenda')"><span class="icon">📅</span><span>Agenda</span><span class="badge" id="badge-agenda">0</span></div>
     <div class="sidebar-logout" onclick="logout()"><span>🚪</span><span>Déconnexion</span></div>
   </div>
 
@@ -295,6 +296,26 @@
       </div>
     </div>
 
+    <!-- AGENDA -->
+    <div class="section" id="section-agenda">
+      <div class="page-title">📅 Agenda des Distributions & Maraudes</div>
+      <div class="filtres">
+        <button class="filtre-btn active" onclick="filtreAgenda(this,'all')">Tous</button>
+        <button class="filtre-btn" onclick="filtreAgenda(this,'repas')">🍲 Repas</button>
+        <button class="filtre-btn" onclick="filtreAgenda(this,'maraude')">🚶 Maraude</button>
+        <button class="filtre-btn" onclick="filtreAgenda(this,'vetements')">👕 Vêtements</button>
+        <button class="filtre-btn" onclick="filtreAgenda(this,'soins')">🏥 Soins</button>
+        <button class="filtre-btn" onclick="filtreAgenda(this,'hebergement')">🛏️ Hébergement</button>
+        <button class="filtre-btn" onclick="filtreAgenda(this,'distribution')">🎁 Distribution</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Type</th><th>Titre</th><th>Association</th><th>Ville</th><th>Date</th><th>Capacité</th><th>Animaux</th><th>Action</th></tr></thead>
+          <tbody id="tbody-agenda"><tr><td colspan="8" class="empty">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- DONS -->
     <div class="section" id="section-dons">
       <div class="page-title">🎁 Gestion des dons</div>
@@ -366,6 +387,7 @@ function showSection(name) {
   if (name === 'moderation') loadModeration();
   if (name === 'carte') loadCarte();
   if (name === 'dons') loadDons();
+  if (name === 'agenda') loadAgenda();
 }
 
 function loadAll() {
@@ -559,6 +581,48 @@ function filtreDons(btn, val) {
 }
 
 document.getElementById('login-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+// AGENDA
+const agendaTypesLabels = {
+  repas: '🍲 Repas', maraude: '🚶 Maraude', vetements: '👕 Vêtements',
+  soins: '🏥 Soins', hebergement: '🛏️ Hébergement', distribution: '🎁 Distribution'
+};
+let filtreAgendaVal = 'all';
+
+async function loadAgenda() {
+  const res = await fetch('/api/admin/agenda', { headers: headers() });
+  const list = await res.json();
+  const filtered = filtreAgendaVal === 'all' ? list : list.filter(e => e.type === filtreAgendaVal);
+  const tbody = document.getElementById('tbody-agenda');
+  document.getElementById('badge-agenda').textContent = list.filter(e => e.actif).length;
+  if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucun événement</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(ev => `
+    <tr style="${!ev.actif ? 'opacity:0.5' : ''}">
+      <td>${agendaTypesLabels[ev.type] || ev.type}</td>
+      <td><strong>${ev.titre}</strong><br><small style="color:var(--gris)">${ev.description || ''}</small></td>
+      <td>${ev.association}</td>
+      <td>${ev.ville}</td>
+      <td>${new Date(ev.date).toLocaleDateString('fr-FR')} ${new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</td>
+      <td>${ev.capacite ? ev.capacite + ' pers.' : '—'}</td>
+      <td>${ev.animaux ? '🐕 Oui' : 'Non'}</td>
+      <td>${ev.actif ? `<button class="btn btn-rouge" onclick="supprimerAgendaItem('${ev._id}')">🗑️ Masquer</button>` : '<span style="color:var(--gris);font-size:11px">Masqué</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+async function supprimerAgendaItem(id) {
+  if (!confirm('Masquer cet événement ?')) return;
+  await fetch('/api/admin/agenda/supprimer', { method: 'POST', headers: headers(), body: JSON.stringify({ id }) });
+  toast('Événement masqué');
+  loadAgenda();
+}
+
+function filtreAgenda(btn, val) {
+  document.querySelectorAll('#section-agenda .filtre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtreAgendaVal = val;
+  loadAgenda();
+}
 </script>
 </body>
 </html>

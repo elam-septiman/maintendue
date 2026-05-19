@@ -79,6 +79,70 @@ const server = http.createServer(async (req, res) => {
   if (pathname.startsWith('/api/')) {
     res.setHeader('Content-Type', 'application/json');
 
+    // ===== AGENDA DISTRIBUTIONS =====
+    if (pathname === '/api/agenda' && req.method === 'GET') {
+      const ville = url.searchParams.get('ville');
+      const type = url.searchParams.get('type');
+      const query = { actif: true, date: { $gte: new Date(new Date().setHours(0,0,0,0)) } };
+      if (ville && ville !== 'all') query.ville = ville;
+      if (type && type !== 'all') query.type = type;
+      const list = await db.collection('agenda').find(query).sort({ date: 1 }).limit(100).toArray();
+      res.writeHead(200);
+      return res.end(JSON.stringify(list));
+    }
+
+    if (pathname === '/api/agenda' && req.method === 'POST') {
+      const data = await readBody(req);
+      const event = {
+        association: sanitize(data.association || 'Bénévoles').substring(0, 100),
+        type: sanitize(data.type || 'repas').substring(0, 50),
+        titre: sanitize(data.titre || '').substring(0, 150),
+        description: sanitize(data.description || '').substring(0, 500),
+        ville: sanitize(data.ville || '').substring(0, 100),
+        adresse: sanitize(data.adresse || '').substring(0, 300),
+        date: new Date(data.date),
+        heureFin: sanitize(data.heureFin || '').substring(0, 10),
+        capacite: parseInt(data.capacite) || null,
+        animaux: data.animaux === true || data.animaux === 'true',
+        contact: sanitize(data.contact || '').substring(0, 200),
+        actif: true,
+        dateCreation: new Date(),
+        signalements: 0
+      };
+      if (!event.titre || !event.ville || isNaN(event.date)) {
+        res.writeHead(400);
+        return res.end(JSON.stringify({ error: 'Titre, ville et date requis' }));
+      }
+      await db.collection('agenda').insertOne(event);
+      broadcastAll({ type: 'nouvel_event', event });
+      res.writeHead(200);
+      return res.end(JSON.stringify({ ok: true }));
+    }
+
+    // Admin agenda
+    if (pathname === '/api/admin/agenda' && req.method === 'GET') {
+      if (!isAdmin(req)) { res.writeHead(401); return res.end(JSON.stringify({ error: 'Non autorisé' })); }
+      const list = await db.collection('agenda').find({}).sort({ date: 1 }).limit(200).toArray();
+      res.writeHead(200);
+      return res.end(JSON.stringify(list));
+    }
+
+    if (pathname === '/api/admin/agenda/supprimer' && req.method === 'POST') {
+      if (!isAdmin(req)) { res.writeHead(401); return res.end(JSON.stringify({ error: 'Non autorisé' })); }
+      const data = await readBody(req);
+      await db.collection('agenda').updateOne({ _id: new ObjectId(data.id) }, { $set: { actif: false } });
+      res.writeHead(200);
+      return res.end(JSON.stringify({ ok: true }));
+    }
+
+    // Seed agenda si vide
+    if (pathname === '/api/agenda/seed' && req.method === 'POST') {
+      const count = await db.collection('agenda').countDocuments();
+      if (count === 0) await seedAgenda();
+      res.writeHead(200);
+      return res.end(JSON.stringify({ ok: true }));
+    }
+
     // Maraudes - position en temps réel
     if (pathname === '/api/maraudes' && req.method === 'GET') {
       const maraudes = await db.collection('maraudes')
