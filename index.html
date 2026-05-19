@@ -641,6 +641,79 @@
       to { transform: translateX(-50%) translateY(0); opacity: 1; }
     }
 
+    /* ========== PAGE DÉMARCHES ========== */
+    #page-demarches { overflow-y: auto; padding: 16px; gap: 14px; }
+
+    .demarche-tabs { display:flex; gap:8px; margin-bottom:4px; }
+    .demarche-tab {
+      flex:1; padding:10px; border:2px solid var(--gris-clair);
+      border-radius:12px; background:var(--blanc); font-size:13px;
+      font-weight:700; cursor:pointer; text-align:center; transition:all 0.2s;
+    }
+    .demarche-tab.active { border-color:var(--bleu); background:var(--bleu); color:white; }
+
+    .demarche-card {
+      background:var(--blanc); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow);
+      border-left:4px solid var(--bleu);
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .demarche-card.fait { border-left-color:var(--vert); opacity:0.7; }
+    .demarche-card.urgent { border-left-color:var(--rouge); }
+
+    .demarche-header { display:flex; align-items:center; gap:10px; }
+    .demarche-titre { font-size:15px; font-weight:800; flex:1; }
+    .demarche-statut {
+      font-size:11px; font-weight:700; padding:3px 10px;
+      border-radius:10px; white-space:nowrap;
+    }
+    .statut-afaire { background:#FEF3C7; color:#92400E; }
+    .statut-encours { background:#DBEAFE; color:#1E40AF; }
+    .statut-fait { background:#D1FAE5; color:#065F46; }
+
+    .demarche-meta { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:var(--gris); }
+    .demarche-meta span { display:flex; align-items:center; gap:4px; }
+    .demarche-actions { display:flex; gap:8px; margin-top:4px; }
+    .demarche-btn {
+      padding:6px 12px; border-radius:8px; font-size:12px;
+      font-weight:700; cursor:pointer; border:none;
+    }
+    .demarche-btn-vert { background:var(--vert); color:white; }
+    .demarche-btn-rouge { background:#FEE2E2; color:var(--rouge); }
+    .demarche-btn-bleu { background:#EFF6FF; color:var(--bleu); }
+
+    .form-demarche {
+      background:var(--blanc); border-radius:var(--radius);
+      padding:18px; box-shadow:var(--shadow);
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .form-demarche-titre { font-size:15px; font-weight:800; }
+
+    .cerfa-card {
+      background:var(--blanc); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow);
+      display:flex; gap:14px; align-items:flex-start;
+    }
+    .cerfa-icon { font-size:32px; flex-shrink:0; }
+    .cerfa-info { flex:1; }
+    .cerfa-titre { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .cerfa-desc { font-size:12px; color:var(--gris); line-height:1.5; margin-bottom:8px; }
+    .cerfa-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .cerfa-btn {
+      padding:7px 14px; border-radius:10px; font-size:12px;
+      font-weight:700; text-decoration:none; display:inline-flex;
+      align-items:center; gap:5px; cursor:pointer; border:none;
+    }
+    .cerfa-btn-bleu { background:var(--bleu); color:white; }
+    .cerfa-btn-gris { background:var(--gris-clair); color:var(--texte); }
+
+    .vie-privee-banner {
+      background:#F0FDF4; border:1px solid #BBF7D0;
+      border-radius:12px; padding:12px 14px;
+      font-size:12px; color:#166534; line-height:1.5;
+      display:flex; align-items:flex-start; gap:8px;
+    }
+
     /* ========== PAGE DONS ========== */
     #page-dons { overflow-y: auto; padding: 16px; gap: 14px; }
 
@@ -1259,6 +1332,186 @@
 
 </div>
 
+<!-- ===== PAGE DÉMARCHES ===== -->
+<div class="page" id="page-demarches">
+
+  <div class="vie-privee-banner" style="margin:16px 16px 0">
+    <span>🔒</span>
+    <span>Tout est stocké <strong>uniquement sur ton téléphone</strong>. Rien n'est envoyé sur nos serveurs. Tes données t'appartiennent.</span>
+  </div>
+
+  <div style="padding:12px 16px 0">
+    <div class="demarche-tabs">
+      <div class="demarche-tab active" id="dtab-liste" onclick="switchDemarcheTab('liste')">📋 Mes RDV</div>
+      <div class="demarche-tab" id="dtab-ajouter" onclick="switchDemarcheTab('ajouter')">➕ Ajouter</div>
+      <div class="demarche-tab" id="dtab-cerfa" onclick="switchDemarcheTab('cerfa')">📄 Formulaires</div>
+    </div>
+  </div>
+
+  <!-- LISTE DES DÉMARCHES -->
+  <div id="demarches-liste" style="padding:12px 16px;display:flex;flex-direction:column;gap:12px">
+    <div id="demarches-container"></div>
+    <div id="demarches-vide" style="display:none;text-align:center;padding:32px;color:var(--gris)">
+      <div style="font-size:48px;margin-bottom:12px">📋</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:8px">Aucune démarche</div>
+      <div style="font-size:13px">Ajoute ton premier RDV ou ta première démarche</div>
+      <button onclick="switchDemarcheTab('ajouter')" style="margin-top:16px;background:var(--bleu);color:white;border:none;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">➕ Ajouter une démarche</button>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE AJOUT -->
+  <div id="demarches-ajouter" style="display:none;padding:12px 16px">
+    <div class="form-demarche">
+      <div class="form-demarche-titre">📝 Nouvelle démarche / RDV</div>
+
+      <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+        <label class="form-label">Titre *</label>
+        <input class="form-input" id="d-titre" placeholder="Ex: RDV CAF, Renouvellement CMU..." maxlength="100">
+      </div>
+
+      <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+        <label class="form-label">Catégorie</label>
+        <select class="form-select" id="d-categorie">
+          <option value="rdv">📅 Rendez-vous</option>
+          <option value="document">📄 Document à fournir</option>
+          <option value="appel">📞 Appel à passer</option>
+          <option value="dossier">📁 Dossier à déposer</option>
+          <option value="droits">⚖️ Droits / Aides</option>
+          <option value="sante">🏥 Santé</option>
+          <option value="logement">🏠 Logement</option>
+          <option value="emploi">💼 Emploi</option>
+          <option value="autre">📌 Autre</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Date</label>
+          <input class="form-input" id="d-date" type="date">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Heure</label>
+          <input class="form-input" id="d-heure" type="time">
+        </div>
+      </div>
+
+      <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+        <label class="form-label">Lieu / Organisme</label>
+        <input class="form-input" id="d-lieu" placeholder="Ex: CAF Paris 13, Rue..." maxlength="200">
+      </div>
+
+      <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+        <label class="form-label">Documents à apporter</label>
+        <textarea class="form-textarea" id="d-documents" placeholder="Ex: CNI, attestation domiciliation, 3 derniers relevés..." maxlength="500" style="min-height:70px;resize:vertical;padding:10px 14px;border:2px solid var(--gris-clair);border-radius:12px;font-size:14px;font-family:inherit;outline:none"></textarea>
+      </div>
+
+      <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="d-notes" placeholder="Infos utiles, numéro de dossier..." maxlength="500" style="min-height:60px;resize:vertical;padding:10px 14px;border:2px solid var(--gris-clair);border-radius:12px;font-size:14px;font-family:inherit;outline:none"></textarea>
+      </div>
+
+      <button onclick="ajouterDemarche()" style="background:var(--bleu);color:white;border:none;padding:14px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        💾 Enregistrer la démarche
+      </button>
+    </div>
+  </div>
+
+  <!-- CERFA / FORMULAIRES OFFLINE -->
+  <div id="demarches-cerfa" style="display:none;padding:12px 16px;display:none;flex-direction:column;gap:12px">
+
+    <div class="vie-privee-banner">
+      <span>📶</span>
+      <span>Ces formulaires sont <strong>accessibles hors connexion</strong> une fois téléchargés. Clique "Mettre en cache".</span>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">🏠</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Demande de domiciliation</div>
+        <div class="cerfa-desc">Pour obtenir une adresse postale sans logement. Nécessaire pour ouvrir ses droits (CAF, Pôle Emploi, Sécu).</div>
+        <div class="cerfa-actions">
+          <a href="https://www.service-public.fr/particuliers/vosdroits/R45993" target="_blank" class="cerfa-btn cerfa-btn-bleu">📥 Télécharger</a>
+          <button onclick="cacherCerfa(this,'cerfa-domiciliation')" class="cerfa-btn cerfa-btn-gris">📶 Mettre en cache</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">💊</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Demande CSS / Complémentaire Santé</div>
+        <div class="cerfa-desc">Ancienne CMU-C. Permet d'être soigné gratuitement. Remplir le formulaire S3711.</div>
+        <div class="cerfa-actions">
+          <a href="https://www.ameli.fr/sites/default/files/formulaires/270/s3711.pdf" target="_blank" class="cerfa-btn cerfa-btn-bleu">📥 Télécharger</a>
+          <button onclick="cacherCerfa(this,'cerfa-css')" class="cerfa-btn cerfa-btn-gris">📶 Mettre en cache</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">💶</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Demande de RSA</div>
+        <div class="cerfa-desc">Revenu de Solidarité Active. Formulaire CERFA 15481. Nécessite une domiciliation.</div>
+        <div class="cerfa-actions">
+          <a href="https://www.service-public.fr/particuliers/vosdroits/R19382" target="_blank" class="cerfa-btn cerfa-btn-bleu">📥 Télécharger</a>
+          <button onclick="cacherCerfa(this,'cerfa-rsa')" class="cerfa-btn cerfa-btn-gris">📶 Mettre en cache</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">🪪</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Demande de CNI (Carte Nationale d'Identité)</div>
+        <div class="cerfa-desc">Formulaire CERFA 12101. Gratuit. La mairie peut aider sans adresse fixe.</div>
+        <div class="cerfa-actions">
+          <a href="https://www.service-public.fr/particuliers/vosdroits/R2944" target="_blank" class="cerfa-btn cerfa-btn-bleu">📥 Télécharger</a>
+          <button onclick="cacherCerfa(this,'cerfa-cni')" class="cerfa-btn cerfa-btn-gris">📶 Mettre en cache</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">🏥</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Demande d'AME (Aide Médicale État)</div>
+        <div class="cerfa-desc">Pour les personnes sans titre de séjour. Accès aux soins gratuits. Formulaire CERFA 60-3547.</div>
+        <div class="cerfa-actions">
+          <a href="https://www.ameli.fr/sites/default/files/formulaires/270/s3547.pdf" target="_blank" class="cerfa-btn cerfa-btn-bleu">📥 Télécharger</a>
+          <button onclick="cacherCerfa(this,'cerfa-ame')" class="cerfa-btn cerfa-btn-gris">📶 Mettre en cache</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">🏡</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Demande de logement social (HLM)</div>
+        <div class="cerfa-desc">Formulaire national unique. Une seule demande valable partout en France. Numéro unique d'enregistrement.</div>
+        <div class="cerfa-actions">
+          <a href="https://www.demande-logement-social.gouv.fr" target="_blank" class="cerfa-btn cerfa-btn-bleu">🌐 Site officiel</a>
+          <button onclick="toast('Accès via le site demande-logement-social.gouv.fr')" class="cerfa-btn cerfa-btn-gris">ℹ️ Infos</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cerfa-card">
+      <div class="cerfa-icon">📞</div>
+      <div class="cerfa-info">
+        <div class="cerfa-titre">Numéros utiles à connaître</div>
+        <div class="cerfa-desc">115 Hébergement · 3114 Crise suicidaire · 39 19 Violences femmes · 119 Enfants en danger · 0800 858 858 Croix-Rouge écoute</div>
+        <div class="cerfa-actions">
+          <a href="tel:115" class="cerfa-btn cerfa-btn-bleu">📞 115</a>
+          <a href="tel:3114" class="cerfa-btn cerfa-btn-gris">📞 3114</a>
+          <a href="tel:3919" class="cerfa-btn cerfa-btn-gris">📞 3919</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ===== PAGE DONS ===== -->
 <div class="page" id="page-dons">
 
@@ -1369,8 +1622,8 @@
   <button class="nav-btn" id="nav-guide" onclick="goTo('guide')">
     <span class="icon">🧭</span>Guide
   </button>
-  <button class="nav-btn" id="nav-dons" onclick="goTo('dons')">
-    <span class="icon">🎁</span>Dons
+  <button class="nav-btn" id="nav-demarches" onclick="goTo('demarches')">
+    <span class="icon">📋</span>Démarches
   </button>
   <button class="nav-btn" id="nav-signalement" onclick="goTo('signalement')">
     <span class="icon">🆘</span>Urgence
@@ -1651,6 +1904,188 @@ async function envoyerSignalement() {
     toast('Erreur réseau. Appelez le 115.');
   }
 }
+
+// ===== JOURNAL DÉMARCHES (localStorage) =====
+const STORAGE_KEY = 'elanprotect_demarches';
+const categoriesIconesDem = {
+  rdv:'📅', document:'📄', appel:'📞', dossier:'📁',
+  droits:'⚖️', sante:'🏥', logement:'🏠', emploi:'💼', autre:'📌'
+};
+
+function getDemarches() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function saveDemarches(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function switchDemarcheTab(tab) {
+  ['liste','ajouter','cerfa'].forEach(t => {
+    document.getElementById('dtab-' + t).classList.toggle('active', t === tab);
+    const el = document.getElementById('demarches-' + t);
+    if (el) el.style.display = t === tab ? (t === 'cerfa' ? 'flex' : 'flex') : 'none';
+  });
+  if (tab === 'liste') afficherDemarches();
+  if (tab === 'ajouter') {
+    // Pré-remplir date avec aujourd'hui
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('d-date').value = today;
+  }
+}
+
+function afficherDemarches() {
+  const list = getDemarches();
+  const container = document.getElementById('demarches-container');
+  const vide = document.getElementById('demarches-vide');
+
+  // Trier par date
+  list.sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(a.date + 'T' + (a.heure || '00:00')) - new Date(b.date + 'T' + (b.heure || '00:00'));
+  });
+
+  if (!list.length) {
+    container.innerHTML = '';
+    vide.style.display = 'block';
+    return;
+  }
+  vide.style.display = 'none';
+
+  const today = new Date().toDateString();
+
+  container.innerHTML = list.map((d, i) => {
+    const dateObj = d.date ? new Date(d.date + 'T12:00:00') : null;
+    const dateStr = dateObj ? dateObj.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' }) : '';
+    const isPast = dateObj && dateObj < new Date() && d.statut !== 'fait';
+    const isToday = dateObj && dateObj.toDateString() === today;
+    const urgentClass = isPast ? 'urgent' : '';
+    const statutClass = d.statut === 'fait' ? 'fait' : urgentClass;
+
+    const statutBadge = {
+      afaire: '<span class="demarche-statut statut-afaire">À faire</span>',
+      encours: '<span class="demarche-statut statut-encours">En cours</span>',
+      fait: '<span class="demarche-statut statut-fait">✅ Fait</span>',
+    }[d.statut] || '';
+
+    return `
+      <div class="demarche-card ${statutClass}" id="dem-${i}">
+        <div class="demarche-header">
+          <span style="font-size:20px">${categoriesIconesDem[d.categorie] || '📌'}</span>
+          <div class="demarche-titre">${d.titre}</div>
+          ${statutBadge}
+        </div>
+        <div class="demarche-meta">
+          ${dateStr ? `<span>📅 ${dateStr}${d.heure ? ' à ' + d.heure : ''}${isToday ? ' <strong style="color:var(--rouge)">• Aujourd\'hui !</strong>' : ''}</span>` : ''}
+          ${d.lieu ? `<span>📍 ${d.lieu}</span>` : ''}
+        </div>
+        ${d.documents ? `<div style="font-size:12px;background:#FEF9C3;border-radius:8px;padding:8px;color:#713F12">📎 À apporter : ${d.documents}</div>` : ''}
+        ${d.notes ? `<div style="font-size:12px;color:var(--gris)">${d.notes}</div>` : ''}
+        <div class="demarche-actions">
+          ${d.statut !== 'fait' ? `<button class="demarche-btn demarche-btn-vert" onclick="marquerFait(${i})">✅ Fait</button>` : ''}
+          ${d.statut === 'afaire' ? `<button class="demarche-btn demarche-btn-bleu" onclick="marquerEncours(${i})">▶️ En cours</button>` : ''}
+          <button class="demarche-btn demarche-btn-rouge" onclick="supprimerDemarche(${i})">🗑️ Supprimer</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function ajouterDemarche() {
+  const titre = document.getElementById('d-titre').value.trim();
+  if (!titre) { toast('Ajoute un titre à ta démarche'); return; }
+
+  const demarche = {
+    id: Date.now(),
+    titre,
+    categorie: document.getElementById('d-categorie').value,
+    date: document.getElementById('d-date').value,
+    heure: document.getElementById('d-heure').value,
+    lieu: document.getElementById('d-lieu').value.trim(),
+    documents: document.getElementById('d-documents').value.trim(),
+    notes: document.getElementById('d-notes').value.trim(),
+    statut: 'afaire',
+    cree: new Date().toISOString()
+  };
+
+  const list = getDemarches();
+  list.push(demarche);
+  saveDemarches(list);
+
+  // Programmer rappel si date future
+  if (demarche.date && demarche.heure) {
+    programmerRappel(demarche);
+  }
+
+  // Reset form
+  ['d-titre','d-lieu','d-documents','d-notes','d-heure'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('d-categorie').value = 'rdv';
+
+  toast('✅ Démarche enregistrée !');
+  switchDemarcheTab('liste');
+}
+
+function marquerFait(i) {
+  const list = getDemarches();
+  if (list[i]) { list[i].statut = 'fait'; saveDemarches(list); afficherDemarches(); toast('✅ Démarche marquée comme faite !'); }
+}
+function marquerEncours(i) {
+  const list = getDemarches();
+  if (list[i]) { list[i].statut = 'encours'; saveDemarches(list); afficherDemarches(); }
+}
+function supprimerDemarche(i) {
+  if (!confirm('Supprimer cette démarche ?')) return;
+  const list = getDemarches();
+  list.splice(i, 1);
+  saveDemarches(list);
+  afficherDemarches();
+}
+
+function programmerRappel(demarche) {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(perm => {
+    if (perm !== 'granted') return;
+    const rdv = new Date(demarche.date + 'T' + demarche.heure);
+    const veille = rdv.getTime() - 86400000; // 24h avant
+    const maintenant = Date.now();
+    if (veille > maintenant) {
+      setTimeout(() => {
+        new Notification('⏰ ElanProtect — Rappel', {
+          body: `RDV demain : ${demarche.titre}${demarche.lieu ? ' — ' + demarche.lieu : ''}`,
+          icon: '/icons/icon.svg'
+        });
+      }, veille - maintenant);
+    }
+  });
+}
+
+function cacherCerfa(btn, id) {
+  btn.textContent = '✅ En cache';
+  btn.style.background = '#D1FAE5';
+  btn.style.color = '#065F46';
+  toast('Formulaire mis en cache hors connexion');
+  // Le service worker s'occupe du cache automatiquement
+}
+
+// Charger les démarches du jour au démarrage + badge
+function checkDemarchesAujourdhui() {
+  const list = getDemarches();
+  const today = new Date().toDateString();
+  const aujourdhui = list.filter(d => {
+    if (!d.date || d.statut === 'fait') return false;
+    return new Date(d.date + 'T12:00:00').toDateString() === today;
+  });
+  if (aujourdhui.length > 0) {
+    const navBtn = document.getElementById('nav-demarches');
+    if (navBtn) {
+      navBtn.querySelector('.icon').textContent = '📋';
+      navBtn.style.color = 'var(--rouge)';
+      toast(`📅 ${aujourdhui.length} démarche(s) aujourd'hui !`);
+    }
+  }
+}
+checkDemarchesAujourdhui();
 
 // ===== MODE BATTERIE CRITIQUE =====
 async function initBatterie() {
@@ -1999,6 +2434,7 @@ goTo = function(page) {
   if (page === 'carte' && !carteInitialisee) initCarte();
   if (page === 'tchat' && !tchatInitialise) initTchat();
   if (page === 'dons') chargerDons();
+  if (page === 'demarches') { switchDemarcheTab('liste'); }
   if (page === 'guide') {
     document.getElementById('guide-plan-screen').style.display = 'none';
     document.getElementById('guide-questions-screen').style.display = 'block';
