@@ -784,14 +784,76 @@
 
 <!-- ===== PAGE SIGNALEMENT ===== -->
 <div class="page" id="page-signalement">
+
+  <!-- ÉCRAN 1 : URGENCE VITALE -->
+  <div id="signalement-ecran-urgence" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+    <div style="background:linear-gradient(135deg,#7F1D1D,#DC2626);border-radius:var(--radius);padding:24px;text-align:center;color:white">
+      <div style="font-size:52px">🆘</div>
+      <h2 style="font-size:20px;font-weight:800;margin:10px 0 8px">Avant tout — est-ce une urgence vitale ?</h2>
+      <p style="font-size:13px;opacity:0.9;line-height:1.5">ElanProtect n'est <strong>pas un service de secours</strong>.<br>En cas de danger immédiat, appelez directement.</p>
+    </div>
+
+    <div style="background:var(--blanc);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)">
+      <div style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--rouge)">⚡ Urgence vitale — Appelez maintenant :</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="tel:15" style="display:flex;align-items:center;gap:14px;background:#FEF2F2;border:2px solid var(--rouge);border-radius:14px;padding:14px 16px;text-decoration:none;transition:opacity 0.2s">
+          <span style="font-size:28px">🚑</span>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:900;color:var(--rouge)">15 — SAMU</div>
+            <div style="font-size:12px;color:#7F1D1D">Urgence médicale, détresse physique</div>
+          </div>
+          <span style="font-size:24px;font-weight:900;color:var(--rouge)">Appeler</span>
+        </a>
+        <a href="tel:17" style="display:flex;align-items:center;gap:14px;background:#EFF6FF;border:2px solid var(--bleu);border-radius:14px;padding:14px 16px;text-decoration:none">
+          <span style="font-size:28px">🚔</span>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:900;color:var(--bleu)">17 — Police</div>
+            <div style="font-size:12px;color:#1E3A5F">Danger, agression, situation menaçante</div>
+          </div>
+          <span style="font-size:24px;font-weight:900;color:var(--bleu)">Appeler</span>
+        </a>
+        <a href="tel:18" style="display:flex;align-items:center;gap:14px;background:#FFF7ED;border:2px solid var(--orange);border-radius:14px;padding:14px 16px;text-decoration:none">
+          <span style="font-size:28px">🔥</span>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:900;color:var(--orange)">18 — Pompiers</div>
+            <div style="font-size:12px;color:#7C2D12">Incendie, accident, urgence grave</div>
+          </div>
+          <span style="font-size:24px;font-weight:900;color:var(--orange)">Appeler</span>
+        </a>
+        <a href="tel:115" style="display:flex;align-items:center;gap:14px;background:#F0FDF4;border:2px solid var(--vert);border-radius:14px;padding:14px 16px;text-decoration:none">
+          <span style="font-size:28px">🏠</span>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:900;color:var(--vert)">115 — Hébergement</div>
+            <div style="font-size:12px;color:#166534">SAMU Social, hébergement d'urgence 24h/24</div>
+          </div>
+          <span style="font-size:24px;font-weight:900;color:var(--vert)">Appeler</span>
+        </a>
+      </div>
+    </div>
+
+    <div style="background:var(--blanc);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center">
+      <div style="font-size:13px;color:var(--gris);margin-bottom:12px">Pas d'urgence vitale ? Signalez via la communauté ElanProtect</div>
+      <button onclick="afficherFormulaireSignalement()" style="background:var(--bleu);color:white;border:none;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;width:100%">
+        📢 Faire un signalement communautaire
+      </button>
+      <div style="font-size:11px;color:var(--gris);margin-top:10px;line-height:1.5">
+        ⚠️ ElanProtect est une plateforme communautaire.<br>Elle ne remplace pas les services d'urgence officiels.
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉCRAN 2 : FORMULAIRE SIGNALEMENT -->
+  <div id="signalement-ecran-formulaire" style="display:none;padding:20px;flex-direction:column;gap:16px">
+    <button onclick="retourUrgence()" style="background:none;border:none;color:var(--bleu);font-size:13px;font-weight:700;cursor:pointer;text-align:left;padding:0">← Retour</button>
+
   <div class="signalement-hero">
-    <div class="icon">🆘</div>
-    <h2>Signalement d'urgence</h2>
-    <p>Signalez rapidement une situation d'urgence. Bénévoles et associations seront alertés.</p>
+    <div class="icon">📢</div>
+    <h2>Signalement communautaire</h2>
+    <p>Signalez une situation sociale. Bénévoles et associations seront alertés.</p>
   </div>
 
   <div>
-    <div class="section-title">Type d'urgence</div>
+    <div class="section-title">Type de situation</div>
     <div class="types-urgence" style="margin-top: 10px;">
       <div class="urgence-type" onclick="selectionnerType(this, 'froid')" data-type="froid">
         <div class="icon">🥶</div>
@@ -841,15 +903,7 @@
     <p>Les bénévoles et associations de votre ville ont été alertés. Merci pour votre solidarité.</p>
   </div>
 
-  <div style="background:var(--blanc); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow);">
-    <div style="font-size:13px; font-weight:700; margin-bottom:10px;">⚡ Urgence vitale ? Appelez directement :</div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="tel:15" style="background:var(--rouge); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">15 SAMU</a>
-      <a href="tel:17" style="background:var(--bleu); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">17 Police</a>
-      <a href="tel:18" style="background:var(--orange); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">18 Pompiers</a>
-      <a href="tel:115" style="background:var(--vert); color:white; padding:10px 16px; border-radius:12px; font-weight:800; text-decoration:none; font-size:16px;">115 Héberg.</a>
-    </div>
-  </div>
+  </div><!-- fin signalement-ecran-formulaire -->
 </div>
 
 <!-- ===== PAGE RESSOURCES ===== -->
@@ -1315,6 +1369,21 @@ async function envoyerSignalement() {
     toast('Erreur réseau. Appelez le 115.');
   }
 }
+
+// ===== SIGNALEMENT - ÉCRANS =====
+function afficherFormulaireSignalement() {
+  document.getElementById('signalement-ecran-urgence').style.display = 'none';
+  const f = document.getElementById('signalement-ecran-formulaire');
+  f.style.display = 'flex';
+  f.scrollTop = 0;
+}
+function retourUrgence() {
+  document.getElementById('signalement-ecran-formulaire').style.display = 'none';
+  document.getElementById('signalement-ecran-urgence').style.display = 'flex';
+}
+
+// Réinitialiser l'écran urgence quand on revient sur la page
+const _goToBase = goTo;
 
 // ===== STATS API =====
 async function chargerStats() {
