@@ -79,6 +79,36 @@ const server = http.createServer(async (req, res) => {
   if (pathname.startsWith('/api/')) {
     res.setHeader('Content-Type', 'application/json');
 
+    // Maraudes - position en temps réel
+    if (pathname === '/api/maraudes' && req.method === 'GET') {
+      const maraudes = await db.collection('maraudes')
+        .find({ actif: true, dateMaj: { $gte: new Date(Date.now() - 3600000) } })
+        .toArray();
+      res.writeHead(200);
+      return res.end(JSON.stringify(maraudes));
+    }
+
+    if (pathname === '/api/maraudes' && req.method === 'POST') {
+      const data = await readBody(req);
+      const maraude = {
+        nom: sanitize(data.nom || 'Équipe bénévole').substring(0, 100),
+        ville: sanitize(data.ville || '').substring(0, 100),
+        lat: parseFloat(data.lat),
+        lng: parseFloat(data.lng),
+        contenu: sanitize(data.contenu || '').substring(0, 300),
+        actif: true,
+        dateMaj: new Date()
+      };
+      await db.collection('maraudes').updateOne(
+        { token: data.token },
+        { $set: maraude },
+        { upsert: true }
+      );
+      broadcastAll({ type: 'maraude_update', maraude });
+      res.writeHead(200);
+      return res.end(JSON.stringify({ ok: true }));
+    }
+
     // Points carte
     if (pathname === '/api/points' && req.method === 'GET') {
       const ville = url.searchParams.get('ville');

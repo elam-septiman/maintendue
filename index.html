@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>ElanProtect - Entraide Sociale</title>
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="ElanProtect — Entraide Sociale">
+  <meta property="og:description" content="Aide aux sans-abri. Anonyme, gratuit, sans inscription.">
+  <meta property="og:type" content="website">
   <meta name="description" content="Plateforme d'entraide pour les personnes sans-abri et en difficulté. Carte des ressources, tchat communautaire, signalement urgent.">
   <meta name="theme-color" content="#1E40AF">
   <link rel="manifest" href="/manifest.json">
@@ -703,6 +707,69 @@
     }
     .msg-signaler-btn:hover { background: var(--gris-clair); color: var(--rouge); }
 
+    /* ========== MODE BATTERIE CRITIQUE ========== */
+    body.batterie-critique {
+      background: white !important;
+    }
+    body.batterie-critique .header {
+      background: #111 !important;
+      padding: 10px 16px !important;
+    }
+    body.batterie-critique .bottom-nav {
+      background: white !important;
+      border-top: 2px solid #111 !important;
+    }
+    body.batterie-critique .nav-btn {
+      font-size: 9px !important;
+    }
+    body.batterie-critique .hero,
+    body.batterie-critique .stat-card,
+    body.batterie-critique .quick-card,
+    body.batterie-critique .urgence-banner,
+    body.batterie-critique .ressource-card,
+    body.batterie-critique .don-card,
+    body.batterie-critique .plan-etape {
+      box-shadow: none !important;
+      background: white !important;
+      border: 1px solid #ccc !important;
+    }
+    body.batterie-critique img,
+    body.batterie-critique .hero-emoji { display: none !important; }
+
+    .batterie-banner {
+      display: none;
+      position: fixed; top: 56px; left: 0; right: 0; z-index: 200;
+      background: #111; color: white;
+      padding: 10px 16px;
+      font-size: 13px; font-weight: 700;
+      text-align: center;
+      max-width: 500px; margin: 0 auto;
+    }
+    .batterie-banner.visible { display: block; }
+    .batterie-urgence-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: white; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px; text-align: center; gap: 20px;
+    }
+    .batterie-urgence-overlay.visible { display: flex; }
+    .batterie-urgence-overlay h2 { font-size: 22px; font-weight: 900; color: #111; }
+    .batterie-urgence-overlay p { font-size: 14px; color: #555; line-height: 1.6; }
+    .batterie-urgence-overlay a {
+      display: block; width: 100%;
+      padding: 18px; border-radius: 12px;
+      font-size: 20px; font-weight: 900;
+      text-decoration: none; color: white;
+      margin-bottom: 6px;
+    }
+    .batterie-urgence-overlay .btn-continuer {
+      background: none; border: 1px solid #ccc;
+      color: #555; font-size: 13px; padding: 10px;
+      border-radius: 10px; cursor: pointer; width: 100%;
+      margin-top: 8px;
+    }
+
     /* Scrollbar */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -711,14 +778,29 @@
 </head>
 <body>
 
+<!-- BANNIÈRE BATTERIE FAIBLE -->
+<div class="batterie-banner" id="batterie-banner">🔋 Batterie faible — Mode économie activé</div>
+
+<!-- OVERLAY BATTERIE CRITIQUE -->
+<div class="batterie-urgence-overlay" id="batterie-overlay">
+  <div style="font-size:64px">🔋</div>
+  <h2>Batterie critique !</h2>
+  <p>Appelle les secours maintenant avant que le téléphone s'éteigne.</p>
+  <a href="tel:115" style="background:#16A34A">🏠 115 — Hébergement</a>
+  <a href="tel:15" style="background:#DC2626">🚑 15 — SAMU</a>
+  <a href="tel:17" style="background:#1E40AF">🚔 17 — Police</a>
+  <a href="tel:18" style="background:#F97316">🔥 18 — Pompiers</a>
+  <button class="btn-continuer" onclick="fermerBatterieOverlay()">Continuer quand même →</button>
+</div>
+
 <!-- HEADER -->
 <div class="header">
-  <div class="header-logo">🤝</div>
+  <div class="header-logo" aria-hidden="true">🤝</div>
   <div>
     <div class="header-title">ElanProtect</div>
-    <div class="header-sub">Entraide solidaire</div>
+    <div class="header-sub">🔒 Anonyme · Gratuit · Sans inscription</div>
   </div>
-  <button class="header-sos" onclick="goTo('signalement')">🆘 SOS</button>
+  <button class="header-sos" onclick="goTo('signalement')" aria-label="Signalement d'urgence">🆘 SOS</button>
 </div>
 
 <!-- ALERTE SIGNALEMENT -->
@@ -836,6 +918,9 @@
     <button class="filtre-btn" data-type="hebergement" onclick="filtrerCarte(this, 'hebergement')">🏠 Hébergement</button>
     <button class="filtre-btn" data-type="douche" onclick="filtrerCarte(this, 'douche')">🚿 Douches</button>
     <button class="filtre-btn" data-type="wifi" onclick="filtrerCarte(this, 'wifi')">📶 Wifi</button>
+    <button class="filtre-btn" data-type="animaux" onclick="filtrerCarte(this, 'animaux')">🐕 Animaux</button>
+    <button class="filtre-btn" data-type="medical" onclick="filtrerCarte(this, 'medical')">🏥 Soins</button>
+    <button class="filtre-btn" data-type="vestimentaire" onclick="filtrerCarte(this, 'vestimentaire')">👕 Vêtements</button>
   </div>
   <div id="map"></div>
   <div class="carte-legende">
@@ -1505,6 +1590,31 @@ function filtrerCarte(btn, type) {
   chargerPoints(type);
 }
 
+// ===== ALERTE MÉTÉO NUIT DANGEREUSE =====
+async function checkMeteo() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const { latitude, longitude } = pos.coords;
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&forecast_days=1&timezone=auto`);
+      const data = await res.json();
+      const temps = data.hourly.temperature_2m;
+      const minNuit = Math.min(...temps.slice(20, 32)); // 20h-8h
+      if (minNuit <= 5) {
+        afficherAlerteMeteo(minNuit);
+      }
+    } catch {}
+  });
+}
+
+function afficherAlerteMeteo(temp) {
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;top:56px;left:0;right:0;z-index:199;background:#1E40AF;color:white;padding:12px 16px;font-size:13px;font-weight:700;text-align:center;max-width:500px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px`;
+  el.innerHTML = `🌡️ Nuit dangereuse : ${temp}°C prévu · <a href="tel:115" style="color:white;text-decoration:underline">Appeler le 115</a> · <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:8px;opacity:0.7">✕</span>`;
+  document.body.insertBefore(el, document.body.firstChild.nextSibling);
+}
+checkMeteo();
+
 // ===== SIGNALEMENT =====
 let typeUrgence = null;
 
@@ -1541,6 +1651,36 @@ async function envoyerSignalement() {
     toast('Erreur réseau. Appelez le 115.');
   }
 }
+
+// ===== MODE BATTERIE CRITIQUE =====
+async function initBatterie() {
+  if (!('getBattery' in navigator)) return;
+  const bat = await navigator.getBattery();
+  function checkBat() {
+    const pct = Math.round(bat.level * 100);
+    const banner = document.getElementById('batterie-banner');
+    const overlay = document.getElementById('batterie-overlay');
+    if (pct <= 5 && !bat.charging) {
+      overlay.classList.add('visible');
+      document.body.classList.add('batterie-critique');
+    } else if (pct <= 15 && !bat.charging) {
+      banner.textContent = `🔋 ${pct}% — Mode économie activé`;
+      banner.classList.add('visible');
+      document.body.classList.add('batterie-critique');
+    } else {
+      banner.classList.remove('visible');
+      overlay.classList.remove('visible');
+      document.body.classList.remove('batterie-critique');
+    }
+  }
+  bat.addEventListener('levelchange', checkBat);
+  bat.addEventListener('chargingchange', checkBat);
+  checkBat();
+}
+function fermerBatterieOverlay() {
+  document.getElementById('batterie-overlay').classList.remove('visible');
+}
+initBatterie();
 
 // ===== GUIDE "JE SUIS À LA RUE" =====
 const reponses = {};
@@ -1893,11 +2033,37 @@ function afficherMessage(msg) {
   const idStr = msg._id ? String(msg._id) : '';
   div.innerHTML = `
     <div class="msg-pseudo">${msg.pseudo}</div>
-    ${msg.texte}
+    <span class="msg-texte">${msg.texte}</span>
     <div class="msg-time">${heure}</div>
-    ${!estMoi && idStr ? `<div class="msg-actions"><button class="msg-signaler-btn" onclick="signalerMessage('${idStr}', this)">⚑ Signaler</button></div>` : ''}
+    ${!estMoi && idStr ? `<div class="msg-actions">
+      <button class="msg-signaler-btn" onclick="signalerMessage('${idStr}', this)">⚑ Signaler</button>
+      <button class="msg-signaler-btn" onclick="traduireMessage(this)">🌍 Traduire</button>
+    </div>` : ''}
   `;
   zone.appendChild(div);
+}
+
+// ===== TRADUCTION MESSAGES =====
+async function traduireMessage(btn) {
+  const bubble = btn.closest('.msg-bubble');
+  const texteEl = bubble.querySelector('.msg-texte');
+  const texte = texteEl.textContent;
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(texte)}&langpair=auto|fr`);
+    const data = await res.json();
+    if (data.responseStatus === 200) {
+      texteEl.innerHTML = `${texte}<br><em style="color:var(--gris);font-size:11px">🌍 ${data.responseData.translatedText}</em>`;
+      btn.textContent = '✅';
+    } else {
+      btn.textContent = '🌍';
+      btn.disabled = false;
+    }
+  } catch {
+    btn.textContent = '🌍';
+    btn.disabled = false;
+  }
 }
 
 // Alerte nouveau don reçu via WebSocket
