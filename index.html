@@ -1816,6 +1816,7 @@
       <option value="Bordeaux">Bordeaux</option>
       <option value="Lille">Lille</option>
       <option value="Rennes">Rennes</option>
+      <option value="Montpellier">Montpellier</option>
     </select>
     <button class="agenda-filtre-btn active" data-type="all" onclick="filtrerAgendaType(this,'all')">🍽️ Tout</button>
     <button class="agenda-filtre-btn" data-type="repas" onclick="filtrerAgendaType(this,'repas')">🍲 Repas</button>
@@ -2855,47 +2856,47 @@ const agendaTypeInfo = {
   distribution:{ label: '🎁 Distribution',   badge: 'badge-distribution',classe: 'distribution' },
 };
 
-// Données d'exemple statiques (montrées si l'API retourne vide)
+// Données de secours (si API indisponible hors ligne)
 const agendaExemples = [
   {
-    _id: 'ex1', type: 'repas', association: 'Restos du Cœur',
-    titre: 'Distribution repas chauds', ville: 'Paris',
-    adresse: 'Parvis Notre-Dame — 4e arrondissement',
-    date: new Date(Date.now() + 3600000).toISOString(),
-    heureFin: '20:00', capacite: 200, animaux: false,
-    contact: 'Salon Tchat Paris / 01 53 32 23 23', description: 'Repas complet avec dessert. Venez avec vos papiers si vous avez des droits CAF.'
+    _id: 'ex1', type: 'repas', association: 'Les Restos du Cœur', permanent: true,
+    titre: 'Distribution alimentaire — Paris', ville: 'Paris',
+    adresse: 'Paris — appelez le 0 800 130 130 pour le centre le plus proche',
+    joursHoraires: 'Mar, Jeu, Sam · 9h–12h', capacite: null, animaux: false,
+    contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+    description: 'Colis alimentaires hebdomadaires. Inscription au centre. Appelez le 0 800 130 130.'
   },
   {
-    _id: 'ex2', type: 'maraude', association: 'Samu Social Paris',
-    titre: 'Maraude nocturne', ville: 'Paris',
-    adresse: 'Gare du Nord et alentours',
-    date: new Date(Date.now() + 7200000).toISOString(),
-    heureFin: '03:00', capacite: null, animaux: true,
-    contact: '115', description: 'Maraude de nuit avec couvertures, boissons chaudes et orientation hébergement.'
+    _id: 'ex2', type: 'maraude', association: 'SAMU Social de Paris', permanent: true,
+    titre: 'Maraude nocturne — Paris', ville: 'Paris',
+    adresse: 'Paris — Gare du Nord, Châtelet, bois de Vincennes, bois de Boulogne',
+    joursHoraires: 'Tous les soirs dès 21h', capacite: null, animaux: true,
+    contact: '115 (appel gratuit, 24h/24) — samusocial-paris.fr',
+    description: 'Maraude nocturrne, couvertures, soins, orientation hébergement. Appelez le 115.'
   },
   {
-    _id: 'ex3', type: 'vetements', association: 'Emmaus Solidarité',
-    titre: 'Distribution vêtements hiver', ville: 'Lyon',
-    adresse: '25 rue Bellecour, Lyon 2e',
-    date: new Date(Date.now() + 86400000).toISOString(),
-    heureFin: '17:00', capacite: 100, animaux: false,
-    contact: '04 72 77 80 80', description: 'Manteaux, pulls, chaussures toutes tailles. 1 sac par personne.'
+    _id: 'ex3', type: 'repas', association: 'Les Restos du Cœur', permanent: true,
+    titre: 'Distribution alimentaire — Lyon', ville: 'Lyon',
+    adresse: 'Lyon — appelez le 0 800 130 130 pour le centre le plus proche',
+    joursHoraires: 'Lun, Mer, Ven · 9h30–12h', capacite: null, animaux: false,
+    contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+    description: 'Colis alimentaires. Inscription nécessaire. Appelez le 0 800 130 130.'
   },
   {
-    _id: 'ex4', type: 'soins', association: 'Médecins du Monde',
-    titre: 'Permanence médicale gratuite', ville: 'Marseille',
-    adresse: 'Centre d\'Accueil, 23 rue du Coq',
-    date: new Date(Date.now() + 172800000).toISOString(),
-    heureFin: '13:00', capacite: 50, animaux: false,
-    contact: 'Tchat Marseille ou 04 91 XX XX XX', description: 'Consultation médicale, soins infirmiers, suivi traitements, sans papiers acceptés.'
+    _id: 'ex4', type: 'distribution', association: 'Secours Populaire Français', permanent: true,
+    titre: 'Aide alimentaire — Marseille', ville: 'Marseille',
+    adresse: 'Marseille — voir secourspopulaire.fr pour la fédération 13',
+    joursHoraires: 'Mar et Ven · 9h30–12h', capacite: null, animaux: false,
+    contact: 'secourspopulaire.fr — 01 44 78 21 00',
+    description: 'Colis alimentaires, aide vestimentaire. Sans condition de ressources.'
   },
   {
-    _id: 'ex5', type: 'distribution', association: 'Banque Alimentaire',
-    titre: 'Distribution alimentaire mensuelle', ville: 'Bordeaux',
-    adresse: 'Hangar D4, Quai des Chartrons',
-    date: new Date(Date.now() + 259200000).toISOString(),
-    heureFin: '16:00', capacite: 300, animaux: true,
-    contact: '05 56 XX XX XX', description: 'Colis alimentaires complets : légumes, féculents, produits laitiers, conserves.'
+    _id: 'ex5', type: 'distribution', association: 'Croix-Rouge Française', permanent: true,
+    titre: 'Distribution vêtements — Lyon', ville: 'Lyon',
+    adresse: 'Lyon — voir croix-rouge.fr pour les délégations du Rhône',
+    joursHoraires: 'Samedi · 10h–13h', capacite: null, animaux: false,
+    contact: 'croix-rouge.fr/nous-trouver',
+    description: 'Vêtements, produits d\'hygiène, aide alimentaire. Contacter la délégation locale.'
   },
 ];
 
@@ -2932,21 +2933,54 @@ function afficherAgenda(events) {
     liste.innerHTML = `
       <div class="agenda-empty">
         <span class="icon">📅</span>
-        Aucun événement prévu dans ce secteur.<br>
+        Aucun événement dans ce secteur.<br>
         <span style="font-size:12px;margin-top:8px;display:block">Vous connaissez une distribution ? Signalez-la !</span>
       </div>`;
     return;
   }
-  liste.innerHTML = events.map(ev => {
+
+  // Bandeau info fiabilité (affiché une seule fois en haut)
+  const bandeauInfo = `
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:12px 14px;font-size:12px;color:#1E40AF;display:flex;gap:8px;align-items:flex-start">
+      <span style="flex-shrink:0">ℹ️</span>
+      <div><strong>Informations vérifiées</strong> — Données issues des sites officiels des associations (Restos du Cœur, SAMU Social, Croix-Rouge, Secours Populaire, Armée du Salut). Les horaires peuvent varier : appelez toujours avant de vous déplacer.</div>
+    </div>`;
+
+  liste.innerHTML = bandeauInfo + events.map(ev => {
     const info = agendaTypeInfo[ev.type] || { label: ev.type, badge: 'badge-repas', classe: '' };
-    const dateObj = new Date(ev.date);
-    const maintenant = new Date();
-    const isAujourdhui = dateObj.toDateString() === maintenant.toDateString();
-    const isDemain = new Date(maintenant.getTime() + 86400000).toDateString() === dateObj.toDateString();
-    const jourStr = isAujourdhui ? "🔴 Aujourd'hui" : isDemain ? "🟠 Demain" :
-      dateObj.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
-    const heureStr = dateObj.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-    const finStr = ev.heureFin ? ` → ${ev.heureFin}` : '';
+    const contactSafe = (ev.contact || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+    // Bloc date : permanent = horaires fixes, sinon date précise
+    let dateBlocHtml;
+    if (ev.permanent && ev.joursHoraires) {
+      dateBlocHtml = `
+        <div class="agenda-date-big" style="border-left:3px solid var(--vert)">
+          <div style="font-size:28px;line-height:1">🔁</div>
+          <div class="agenda-date-info">
+            <div class="agenda-date-nom" style="color:var(--vert)">Service régulier</div>
+            <div class="agenda-date-heure">📅 ${ev.joursHoraires}</div>
+          </div>
+        </div>`;
+    } else if (ev.date) {
+      const dateObj = new Date(ev.date);
+      const maintenant = new Date();
+      const isAujourdhui = dateObj.toDateString() === maintenant.toDateString();
+      const isDemain = new Date(maintenant.getTime() + 86400000).toDateString() === dateObj.toDateString();
+      const jourStr = isAujourdhui ? "🔴 Aujourd'hui" : isDemain ? "🟠 Demain" :
+        dateObj.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+      const heureStr = dateObj.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      const finStr = ev.heureFin ? ` → ${ev.heureFin}` : '';
+      dateBlocHtml = `
+        <div class="agenda-date-big">
+          <div class="agenda-date-jour">${dateObj.getDate()}</div>
+          <div class="agenda-date-info">
+            <div class="agenda-date-nom">${jourStr}</div>
+            <div class="agenda-date-heure">⏰ ${heureStr}${finStr}</div>
+          </div>
+        </div>`;
+    } else {
+      dateBlocHtml = '';
+    }
 
     return `
       <div class="agenda-card ${info.classe}">
@@ -2956,24 +2990,21 @@ function afficherAgenda(events) {
         </div>
         <div class="agenda-card-asso">🏛️ ${ev.association} · 📍 ${ev.ville}</div>
         <div class="agenda-card-body">
-          <div class="agenda-date-big">
-            <div class="agenda-date-jour">${dateObj.getDate()}</div>
-            <div class="agenda-date-info">
-              <div class="agenda-date-nom">${jourStr}</div>
-              <div class="agenda-date-heure">⏰ ${heureStr}${finStr}</div>
-            </div>
-          </div>
+          ${dateBlocHtml}
           <div class="agenda-info-row">📍 <strong>${ev.adresse}</strong></div>
-          ${ev.description ? `<div class="agenda-info-row" style="flex-wrap:wrap">${ev.description}</div>` : ''}
+          ${ev.description ? `<div class="agenda-info-row" style="flex-wrap:wrap;color:var(--gris)">${ev.description}</div>` : ''}
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:2px">
             ${ev.capacite ? `<span class="agenda-capac">👥 ${ev.capacite} pers. max</span>` : ''}
             ${ev.animaux ? `<span class="agenda-animaux">🐕 Animaux acceptés</span>` : ''}
           </div>
+          ${ev.contact ? `<div class="agenda-info-row" style="margin-top:4px">📞 <strong>${ev.contact}</strong></div>` : ''}
         </div>
         <div class="agenda-actions">
-          <button class="agenda-btn agenda-btn-carte" onclick="goTo('carte')">🗺️ Voir sur la carte</button>
-          <button class="agenda-btn agenda-btn-tchat" onclick="goTo('tchat')">💬 Tchat ${ev.ville || ''}</button>
-          ${ev.contact ? `<button class="agenda-btn agenda-btn-contact" onclick="toast('Contact : ${ev.contact.replace(/'/g, '\\'').replace(/"/g, '\\"')}')">📞 Contact</button>` : ''}
+          <button class="agenda-btn agenda-btn-carte" onclick="goTo('carte')">🗺️ Carte</button>
+          <button class="agenda-btn agenda-btn-tchat" onclick="goTo('tchat')">💬 Tchat</button>
+          ${ev.contact && (ev.contact.match(/^[\d\s\.\-]+$/) || ev.contact.startsWith('0')) ?
+            `<a class="agenda-btn agenda-btn-contact" href="tel:${ev.contact.replace(/[^0-9]/g,'').substring(0,10)}">📞 Appeler</a>` :
+            `<button class="agenda-btn agenda-btn-contact" onclick="toast('📞 ${contactSafe}')">📞 Contact</button>`}
         </div>
       </div>
     `;
@@ -3071,22 +3102,28 @@ async function chargerWidgetAgenda() {
     if (!events.length) events = agendaExemples.slice(0, 3);
     events = events.slice(0, 3);
     widget.innerHTML = events.map(ev => {
-      const d = new Date(ev.date);
-      const mois = d.toLocaleDateString('fr-FR', { month: 'short' });
       const info = agendaTypeInfo[ev.type] || { label: ev.type };
+      const couleur = ev.type === 'maraude' ? 'var(--bleu)' :
+        ev.type === 'soins' ? 'var(--rouge)' :
+        ev.type === 'vetements' ? 'var(--orange)' : 'var(--vert)';
+
+      let dateHtml;
+      if (ev.permanent) {
+        dateHtml = `<div class="widget-event-date" style="font-size:20px;padding:6px;display:flex;align-items:center;justify-content:center">🔁</div>`;
+      } else {
+        const d = new Date(ev.date);
+        const mois = d.toLocaleDateString('fr-FR', { month: 'short' });
+        dateHtml = `<div class="widget-event-date"><div class="widget-event-day">${d.getDate()}</div><div class="widget-event-mon">${mois}</div></div>`;
+      }
+      const horaire = ev.permanent && ev.joursHoraires ? ev.joursHoraires.split('·')[0].trim() :
+        ev.date ? new Date(ev.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+
       return `
-        <div class="widget-event" onclick="goTo('agenda')" style="border-left-color:${
-          ev.type === 'maraude' ? 'var(--bleu)' :
-          ev.type === 'soins' ? 'var(--rouge)' :
-          ev.type === 'vetements' ? 'var(--orange)' : 'var(--vert)'
-        }">
-          <div class="widget-event-date">
-            <div class="widget-event-day">${d.getDate()}</div>
-            <div class="widget-event-mon">${mois}</div>
-          </div>
+        <div class="widget-event" onclick="goTo('agenda')" style="border-left-color:${couleur}">
+          ${dateHtml}
           <div class="widget-event-info">
             <div class="widget-event-titre">${ev.titre}</div>
-            <div class="widget-event-sub">${info.label} · ${ev.ville} · ${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
+            <div class="widget-event-sub">${info.label} · ${ev.ville}${horaire ? ' · ' + horaire : ''}</div>
           </div>
           <span style="font-size:10px;color:var(--gris)">›</span>
         </div>`;

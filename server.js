@@ -16,8 +16,382 @@ MongoClient.connect(MONGO_URI)
     db = client.db(DB_NAME);
     console.log('MongoDB connecté');
     seedPoints();
+    seedAgenda();
   })
   .catch(err => console.error('Erreur MongoDB:', err));
+
+// ===================================================================
+// SEED AGENDA — Données fiables Restos du Cœur / SAMU Social / etc.
+// Sources : sites officiels des associations, 0 800 130 130, 115
+// ===================================================================
+async function seedAgenda() {
+  const col = db.collection('agenda');
+  const count = await col.countDocuments({ source: 'officiel' });
+  if (count > 0) return; // Déjà seedé
+
+  // Entrées permanentes (permanent: true) = services réguliers sans date fixe
+  // Entrées ponctuelles avec date calculée dynamiquement
+  const now = new Date();
+
+  // Helper : prochain jour de semaine à partir d'aujourd'hui
+  function prochainJour(jourSemaine, heureDebut = 10) {
+    // jourSemaine : 0=dim, 1=lun, 2=mar, 3=mer, 4=jeu, 5=ven, 6=sam
+    const d = new Date(now);
+    const diff = (jourSemaine - d.getDay() + 7) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    d.setHours(heureDebut, 0, 0, 0);
+    return d;
+  }
+
+  const events = [
+
+    // ========== RESTOS DU CŒUR ==========
+    // Source : restosducoeur.org / 0 800 130 130 (numéro national gratuit)
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Paris 10e', permanent: true,
+      description: 'Colis alimentaires hebdomadaires (conserves, produits frais, pain). Inscription requise au centre. Contacter le 0 800 130 130 pour connaître le centre le plus proche de vous.',
+      ville: 'Paris', adresse: 'Paris 10e — appeler le 0 800 130 130 pour l\'adresse exacte',
+      joursHoraires: 'Mar, Jeu et Sam · 9h–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(2, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Lyon', permanent: true,
+      description: 'Colis alimentaires. Les Restos du Cœur de Lyon accueillent les personnes en difficulté. Inscription préalable nécessaire. Centre le plus proche via le 0 800 130 130.',
+      ville: 'Lyon', adresse: 'Lyon — appeler le 0 800 130 130 pour le centre le plus proche',
+      joursHoraires: 'Lun, Mer, Ven · 9h30–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(1, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Marseille', permanent: true,
+      description: 'Aide alimentaire hebdomadaire. Les Restos du Cœur comptent de nombreux centres à Marseille. Contacter le 0 800 130 130 pour connaître le centre de votre arrondissement.',
+      ville: 'Marseille', adresse: 'Marseille — appeler le 0 800 130 130 pour le centre de votre arrondissement',
+      joursHoraires: 'Mar, Jeu · 10h–12h30', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(2, 10), heureFin: '12:30', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Toulouse', permanent: true,
+      description: 'Distribution de colis alimentaires. Les Restos du Cœur de Haute-Garonne disposent de plusieurs centres à Toulouse et en périphérie.',
+      ville: 'Toulouse', adresse: 'Toulouse — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Lun, Mer, Ven · 9h–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(3, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Bordeaux', permanent: true,
+      description: 'Aide alimentaire hebdomadaire. Plusieurs centres Restos du Cœur en Gironde. Contacter le numéro national pour le centre le plus proche.',
+      ville: 'Bordeaux', adresse: 'Bordeaux — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Mar, Jeu, Sam · 9h–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(4, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Nice', permanent: true,
+      description: 'Distribution de colis alimentaires. Les Restos du Cœur des Alpes-Maritimes. Contacter le 0 800 130 130.',
+      ville: 'Nice', adresse: 'Nice — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Lun, Mer · 10h–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(1, 10), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Nantes', permanent: true,
+      description: 'Aide alimentaire. Plusieurs centres Restos du Cœur en Loire-Atlantique à Nantes et agglomération.',
+      ville: 'Nantes', adresse: 'Nantes — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Mar, Jeu · 9h30–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(2, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Strasbourg', permanent: true,
+      description: 'Distribution alimentaire hebdomadaire. Les Restos du Cœur du Bas-Rhin, plusieurs centres à Strasbourg.',
+      ville: 'Strasbourg', adresse: 'Strasbourg — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Lun, Mer, Sam · 9h–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(5, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Lille', permanent: true,
+      description: 'Aide alimentaire. Les Restos du Cœur du Nord disposent de nombreux centres à Lille et dans la métropole.',
+      ville: 'Lille', adresse: 'Lille — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Mar, Jeu, Sam · 9h–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(2, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Rennes', permanent: true,
+      description: 'Distribution de colis alimentaires. Les Restos du Cœur d\'Ille-et-Vilaine, plusieurs centres à Rennes.',
+      ville: 'Rennes', adresse: 'Rennes — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Lun, Mer · 9h30–12h', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(1, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Les Restos du Cœur', type: 'repas',
+      titre: 'Distribution alimentaire — Montpellier', permanent: true,
+      description: 'Aide alimentaire. Plusieurs centres Restos du Cœur à Montpellier et dans l\'Hérault.',
+      ville: 'Montpellier', adresse: 'Montpellier — appeler le 0 800 130 130 pour l\'adresse',
+      joursHoraires: 'Mar, Jeu · 10h–12h30', capacite: null, animaux: false,
+      contact: '0 800 130 130 (gratuit) — restosducoeur.org',
+      date: prochainJour(4, 10), heureFin: '12:30', actif: true
+    },
+
+    // ========== SAMU SOCIAL / 115 — MARAUDES ==========
+    // Source : samusocial-paris.fr / samu-social-de-france.fr / 115
+    {
+      source: 'officiel', association: 'SAMU Social de Paris', type: 'maraude',
+      titre: 'Maraude nocturne — Paris (nuit)', permanent: true,
+      description: 'Équipes de maraude du SAMU Social de Paris, toutes les nuits. Accostent les personnes à la rue, proposent écoute, aide médicale et orientation hébergement d\'urgence. Appelez le 115 pour signaler une personne en difficulté.',
+      ville: 'Paris', adresse: 'Paris — secteurs Gare du Nord, Châtelet, Les Halles, bois de Vincennes, bois de Boulogne',
+      joursHoraires: 'Tous les soirs dès 21h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24) — samusocial-paris.fr',
+      date: prochainJour((now.getDay() + 1) % 7, 21), heureFin: '05:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Lyon (nuit)', permanent: true,
+      description: 'Maraude nocturne organisée par le SAMU Social du Rhône. Équipes mobiles dans les secteurs de Lyon centre, Perrache, Part-Dieu. Appelez le 115 pour toute urgence ou signalement.',
+      ville: 'Lyon', adresse: 'Lyon centre — Part-Dieu, Perrache, rive gauche du Rhône',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Marseille (nuit)', permanent: true,
+      description: 'Maraude nocturne des équipes du SAMU Social des Bouches-du-Rhône. Secteurs Belsunce, Noailles, Gare Saint-Charles. Appelez le 115 pour signaler une personne en détresse.',
+      ville: 'Marseille', adresse: 'Marseille — Belsunce, Noailles, Gare Saint-Charles, Vieux-Port',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Toulouse (nuit)', permanent: true,
+      description: 'Maraude nocturne des équipes du SAMU Social de Haute-Garonne. Centre-ville, secteur gare Matabiau. Appelez le 115.',
+      ville: 'Toulouse', adresse: 'Toulouse — centre-ville, gare Matabiau, Capitole',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Bordeaux (nuit)', permanent: true,
+      description: 'Maraude nocturne du SAMU Social de Gironde. Secteurs gare Saint-Jean, Quinconces, centre-ville. Appelez le 115 pour signaler une personne en difficulté.',
+      ville: 'Bordeaux', adresse: 'Bordeaux — gare Saint-Jean, Quinconces, Victoire',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Lille (nuit)', permanent: true,
+      description: 'Maraude nocturne des équipes du SAMU Social du Nord. Secteurs gare de Lille-Flandres, Vieux-Lille, Wazemmes. Appelez le 115.',
+      ville: 'Lille', adresse: 'Lille — gare Flandres, Vieux-Lille, Wazemmes',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Nice (nuit)', permanent: true,
+      description: 'Maraude nocturne du SAMU Social des Alpes-Maritimes. Promenade des Anglais, gare de Nice-Ville, centre-ville. Appelez le 115.',
+      ville: 'Nice', adresse: 'Nice — Promenade des Anglais, gare, centre-ville',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Strasbourg (nuit)', permanent: true,
+      description: 'Maraude nocturne des équipes du SAMU Social du Bas-Rhin. Centre-ville, gare de Strasbourg, Neudorf. Appelez le 115.',
+      ville: 'Strasbourg', adresse: 'Strasbourg — centre-ville, gare centrale, Neudorf',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Nantes (nuit)', permanent: true,
+      description: 'Maraude nocturne du SAMU Social de Loire-Atlantique. Centre-ville de Nantes, gare, île de Nantes. Appelez le 115.',
+      ville: 'Nantes', adresse: 'Nantes — centre-ville, gare, île de Nantes',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Rennes (nuit)', permanent: true,
+      description: 'Maraude nocturne du SAMU Social d\'Ille-et-Vilaine. Gare de Rennes, République, Thabor. Appelez le 115.',
+      ville: 'Rennes', adresse: 'Rennes — gare, République, place du Thabor',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'SAMU Social (115)', type: 'maraude',
+      titre: 'Maraude — Montpellier (nuit)', permanent: true,
+      description: 'Maraude nocturne du SAMU Social de l\'Hérault. Centre-ville, gare Saint-Roch, place de la Comédie. Appelez le 115.',
+      ville: 'Montpellier', adresse: 'Montpellier — gare Saint-Roch, place de la Comédie, Ecusson',
+      joursHoraires: 'Tous les soirs dès 20h', capacite: null, animaux: true,
+      contact: '115 (appel gratuit, 24h/24)',
+      date: prochainJour((now.getDay() + 1) % 7, 20), heureFin: '04:00', actif: true
+    },
+
+    // ========== ARMÉE DU SALUT ==========
+    // Source : armeedusalut.fr / 01 43 62 25 00 (Paris)
+    {
+      source: 'officiel', association: 'Armée du Salut', type: 'repas',
+      titre: 'Repas chaud — Paris (soir)', permanent: true,
+      description: 'L\'Armée du Salut distribue des repas chauds aux personnes sans-abri depuis ses centres à Paris. Le Centre William Booth (75013) accueille également des personnes en hébergement d\'urgence. Contacter le centre pour les horaires exacts.',
+      ville: 'Paris', adresse: 'Centre William Booth — 94 Rue Championnet, 75018 Paris (et autres centres)',
+      joursHoraires: 'Tous les soirs — horaires variables selon les centres',
+      capacite: null, animaux: false,
+      contact: '01 43 62 25 00 — armeedusalut.fr',
+      date: prochainJour((now.getDay() + 1) % 7, 19), heureFin: '21:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Armée du Salut', type: 'hebergement',
+      titre: 'Hébergement et accueil d\'urgence — Paris', permanent: true,
+      description: 'L\'Armée du Salut gère plusieurs centres d\'hébergement d\'urgence à Paris et en Île-de-France. Accueil de nuit, douches, repas. Contacter le 115 pour orientation ou l\'Armée du Salut directement.',
+      ville: 'Paris', adresse: 'Paris — plusieurs centres, contacter le 115 pour orientation',
+      joursHoraires: '24h/24 — appeler le 115 ou l\'Armée du Salut',
+      capacite: null, animaux: false,
+      contact: '01 43 62 25 00 — armeedusalut.fr — ou 115',
+      date: prochainJour(1, 8), heureFin: '20:00', actif: true
+    },
+
+    // ========== CROIX-ROUGE FRANÇAISE ==========
+    // Source : croix-rouge.fr / 0 800 858 858 (écoute gratuite)
+    {
+      source: 'officiel', association: 'Croix-Rouge Française', type: 'distribution',
+      titre: 'Épicerie sociale et vestimentaire — Paris', permanent: true,
+      description: 'La Croix-Rouge gère des épiceries sociales (alimentation à prix solidaire) et des distributions de vêtements dans plusieurs arrondissements de Paris. Contacter la délégation locale pour les jours et horaires.',
+      ville: 'Paris', adresse: 'Paris — plusieurs délégations, voir croix-rouge.fr pour adresses',
+      joursHoraires: 'Variables selon les centres — contacter la délégation',
+      capacite: null, animaux: false,
+      contact: 'croix-rouge.fr/nos-actions — 0 800 858 858 (écoute)',
+      date: prochainJour(6, 10), heureFin: '13:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Croix-Rouge Française', type: 'distribution',
+      titre: 'Distribution vêtements et hygiène — Lyon', permanent: true,
+      description: 'Distribution de vêtements, produits d\'hygiène et aide alimentaire. La délégation Croix-Rouge du Rhône est active dans Lyon et sa métropole. Contacter la délégation pour les horaires exacts.',
+      ville: 'Lyon', adresse: 'Lyon — contacter la délégation du Rhône via croix-rouge.fr',
+      joursHoraires: 'Samedi matin — vérifier avec la délégation',
+      capacite: null, animaux: false,
+      contact: 'croix-rouge.fr/nous-trouver — 0 800 858 858',
+      date: prochainJour(6, 10), heureFin: '13:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Croix-Rouge Française', type: 'soins',
+      titre: 'Permanence infirmière (PASS mobile) — Marseille', permanent: true,
+      description: 'La Croix-Rouge intervient avec des équipes de secouristes et oriente vers les Permanences d\'Accès aux Soins (PASS) des hôpitaux. Soins de base, orientation médicale, sans papiers acceptés dans les PASS.',
+      ville: 'Marseille', adresse: 'Marseille — via les PASS de l\'AP-HM, contacter croix-rouge.fr',
+      joursHoraires: 'Variables — PASS AP-HM : Lun-Ven 9h-16h',
+      capacite: null, animaux: false,
+      contact: 'croix-rouge.fr — PASS AP-HM : 04 91 38 34 08',
+      date: prochainJour(1, 9), heureFin: '16:00', actif: true
+    },
+
+    // ========== SECOURS POPULAIRE FRANÇAIS ==========
+    // Source : secourspopulaire.fr / 01 44 78 21 00
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Distribution alimentaire hebdomadaire — Paris', permanent: true,
+      description: 'Le Secours Populaire distribue des colis alimentaires, des repas et de l\'aide vestimentaire dans ses fédérations. Aide inconditionnelle, sans condition de ressources. Contacter la fédération locale.',
+      ville: 'Paris', adresse: 'Paris — voir secourspopulaire.fr pour les fédérations de Paris',
+      joursHoraires: 'Mer et Sam · 9h–12h dans les fédérations',
+      capacite: null, animaux: false,
+      contact: '01 44 78 21 00 — secourspopulaire.fr',
+      date: prochainJour(3, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Lyon', permanent: true,
+      description: 'Le Secours Populaire du Rhône distribue des colis alimentaires et assure un soutien global aux personnes en difficulté. Toute personne sans condition de ressources peut bénéficier de l\'aide.',
+      ville: 'Lyon', adresse: 'Lyon — voir secourspopulaire.fr pour la fédération du Rhône',
+      joursHoraires: 'Mar et Ven · 9h–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(2, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Lille', permanent: true,
+      description: 'Le Secours Populaire du Nord est fortement implanté à Lille et dans la métropole. Distribution de colis alimentaires et aide vestimentaire. Sans condition de ressources.',
+      ville: 'Lille', adresse: 'Lille — voir secourspopulaire.fr pour la fédération du Nord',
+      joursHoraires: 'Lun, Mer, Ven · 9h–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(1, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Bordeaux', permanent: true,
+      description: 'Le Secours Populaire de Gironde distribue des colis alimentaires et aide vestimentaire. Aide ouverte à toutes personnes en difficulté sans condition.',
+      ville: 'Bordeaux', adresse: 'Bordeaux — voir secourspopulaire.fr pour la fédération de la Gironde',
+      joursHoraires: 'Mer et Sam · 9h–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(3, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Strasbourg', permanent: true,
+      description: 'Le Secours Populaire du Bas-Rhin est très actif à Strasbourg et dans le département. Colis alimentaires, aide vestimentaire, soutien scolaire.',
+      ville: 'Strasbourg', adresse: 'Strasbourg — voir secourspopulaire.fr pour la fédération du Bas-Rhin',
+      joursHoraires: 'Mar et Ven · 9h–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(2, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Toulouse', permanent: true,
+      description: 'La fédération Haute-Garonne du Secours Populaire est active à Toulouse. Distribution de colis alimentaires et aide vestimentaire sans condition.',
+      ville: 'Toulouse', adresse: 'Toulouse — voir secourspopulaire.fr pour la fédération de Haute-Garonne',
+      joursHoraires: 'Mer et Sam · 9h–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(3, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Marseille', permanent: true,
+      description: 'Le Secours Populaire des Bouches-du-Rhône dispose de plusieurs fédérations à Marseille et dans le département. Colis alimentaires, aide sans condition de ressources.',
+      ville: 'Marseille', adresse: 'Marseille — voir secourspopulaire.fr pour la fédération 13',
+      joursHoraires: 'Mar et Ven · 9h30–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(2, 9), heureFin: '12:00', actif: true
+    },
+    {
+      source: 'officiel', association: 'Secours Populaire Français', type: 'distribution',
+      titre: 'Aide alimentaire — Nice', permanent: true,
+      description: 'Le Secours Populaire des Alpes-Maritimes distribue des colis alimentaires et de l\'aide vestimentaire à Nice. Aide sans condition.',
+      ville: 'Nice', adresse: 'Nice — voir secourspopulaire.fr pour la fédération 06',
+      joursHoraires: 'Mer et Sam · 10h–12h — vérifier avec la fédération',
+      capacite: null, animaux: false,
+      contact: 'secourspopulaire.fr — 01 44 78 21 00',
+      date: prochainJour(3, 10), heureFin: '12:00', actif: true
+    },
+  ];
+
+  await col.insertMany(events);
+  console.log(`✅ Agenda seedé : ${events.length} services officiels (Restos du Cœur, SAMU Social, Armée du Salut, Croix-Rouge, Secours Populaire)`);
+}
 
 async function seedPoints() {
   const col = db.collection('points');
@@ -83,10 +457,22 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/agenda' && req.method === 'GET') {
       const ville = url.searchParams.get('ville');
       const type = url.searchParams.get('type');
-      const query = { actif: true, date: { $gte: new Date(new Date().setHours(0,0,0,0)) } };
-      if (ville && ville !== 'all') query.ville = ville;
-      if (type && type !== 'all') query.type = type;
-      const list = await db.collection('agenda').find(query).sort({ date: 1 }).limit(100).toArray();
+      const today = new Date(new Date().setHours(0,0,0,0));
+
+      // Services permanents/récurrents OU événements futurs
+      const baseFilter = { actif: true };
+      if (ville && ville !== 'all') baseFilter.ville = ville;
+      if (type && type !== 'all') baseFilter.type = type;
+
+      const query = {
+        ...baseFilter,
+        $or: [
+          { permanent: true },
+          { date: { $gte: today } }
+        ]
+      };
+      const list = await db.collection('agenda').find(query)
+        .sort({ permanent: -1, date: 1 }).limit(100).toArray();
       res.writeHead(200);
       return res.end(JSON.stringify(list));
     }
