@@ -896,6 +896,9 @@ wss.on('connection', (ws) => {
   ws.on('close', () => clients.delete(ws));
 });
 
+// Servir flyer.html et offline.html comme pages statiques spéciales
+// (géré dans la section fichiers statiques plus bas)
+
 function broadcastAll(payload) {
   const str = JSON.stringify(payload);
   wss.clients.forEach(c => { if (c.readyState === WebSocket.OPEN) c.send(str); });

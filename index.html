@@ -1188,6 +1188,9 @@
 </head>
 <body>
 
+<!-- SKIP LINK (accessibilité clavier) -->
+<a href="#main-content" class="skip-link" style="position:fixed;top:-100px;left:8px;z-index:9999;background:var(--bleu);color:white;padding:8px 16px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;transition:top 0.2s" onfocus="this.style.top='8px'" onblur="this.style.top='-100px'">Aller au contenu principal</a>
+
 <!-- BANNIÈRE BATTERIE FAIBLE -->
 <div class="batterie-banner" id="batterie-banner">🔋 Batterie faible — Mode économie activé</div>
 
@@ -1232,20 +1235,21 @@
 </div>
 
 <!-- HEADER -->
-<div class="header">
+<header class="header" role="banner">
   <div class="header-logo" aria-hidden="true">🤝</div>
   <div>
     <div class="header-title">ElanProtect</div>
-    <div class="header-sub">🔒 Anonyme · Gratuit · Sans inscription</div>
+    <div class="header-sub" aria-label="Anonyme, gratuit, sans inscription">🔒 Anonyme · Gratuit · Sans inscription</div>
   </div>
-  <button class="header-sos" onclick="goTo('signalement')" aria-label="Signalement d'urgence">🆘 SOS</button>
-</div>
+  <button class="header-sos" onclick="goTo('signalement')" aria-label="Ouvrir la page de signalement d'urgence">🆘 SOS</button>
+</header>
 
 <!-- ALERTE SIGNALEMENT -->
 <div class="alerte-signalement" id="alerte-signalement"></div>
 
 <!-- ===== PAGE ACCUEIL ===== -->
-<div class="page active" id="page-accueil">
+<main id="main-content">
+<div class="page active" id="page-accueil" role="main" aria-label="Page d'accueil">
   <div class="hero">
     <div class="hero-emoji">🤝</div>
     <h2>Ensemble, on est plus forts</h2>
@@ -2343,30 +2347,32 @@
   </div>
 </div>
 
+</main>
+
 <!-- NAV BAS -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-accueil" onclick="goTo('accueil')">
-    <span class="icon">🏠</span>Accueil
+<nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+  <button class="nav-btn active" id="nav-accueil" onclick="goTo('accueil')" aria-label="Accueil" aria-current="page">
+    <span class="icon" aria-hidden="true">🏠</span>Accueil
   </button>
-  <button class="nav-btn" id="nav-carte" onclick="goTo('carte')">
-    <span class="icon">🗺️</span>Carte
+  <button class="nav-btn" id="nav-carte" onclick="goTo('carte')" aria-label="Carte des ressources">
+    <span class="icon" aria-hidden="true">🗺️</span>Carte
   </button>
-  <button class="nav-btn" id="nav-agenda" onclick="goTo('agenda')">
-    <span class="icon">📅</span>Agenda
+  <button class="nav-btn" id="nav-agenda" onclick="goTo('agenda')" aria-label="Agenda des distributions">
+    <span class="icon" aria-hidden="true">📅</span>Agenda
   </button>
-  <button class="nav-btn" id="nav-guide" onclick="goTo('guide')">
-    <span class="icon">🧭</span>Guide
+  <button class="nav-btn" id="nav-guide" onclick="goTo('guide')" aria-label="Guide personnalisé">
+    <span class="icon" aria-hidden="true">🧭</span>Guide
   </button>
-  <button class="nav-btn" id="nav-demarches" onclick="goTo('demarches')">
-    <span class="icon">📋</span>Dém.
+  <button class="nav-btn" id="nav-demarches" onclick="goTo('demarches')" aria-label="Journal des démarches">
+    <span class="icon" aria-hidden="true">📋</span>Dém.
   </button>
-  <button class="nav-btn" id="nav-signalement" onclick="goTo('signalement')">
-    <span class="icon">🆘</span>SOS
+  <button class="nav-btn" id="nav-signalement" onclick="goTo('signalement')" aria-label="Signalement d'urgence SOS">
+    <span class="icon" aria-hidden="true">🆘</span>SOS
   </button>
 </nav>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<!-- Toast (région live pour lecteurs d'écran) -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 // ===== NAVIGATION =====
@@ -3160,11 +3166,14 @@ async function publierDon() {
 const _goToBase2 = goTo;
 goTo = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.remove('active');
+    b.removeAttribute('aria-current');
+  });
   const pageEl = document.getElementById('page-' + page);
   const navEl = document.getElementById('nav-' + page);
-  if (pageEl) pageEl.classList.add('active');
-  if (navEl) navEl.classList.add('active');
+  if (pageEl) { pageEl.classList.add('active'); pageEl.focus && pageEl.setAttribute('tabindex', '-1'); }
+  if (navEl) { navEl.classList.add('active'); navEl.setAttribute('aria-current', 'page'); }
   pageActive = page;
   if (page === 'carte' && !carteInitialisee) initCarte();
   if (page === 'tchat' && !tchatInitialise) initTchat();

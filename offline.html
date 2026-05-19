@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElanProtect — Hors connexion</title>
+  <meta name="theme-color" content="#1E40AF">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F0F4FF; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px; text-align: center; color: #1E293B;
+    }
+    .icon { font-size: 64px; margin-bottom: 16px; }
+    h1 { font-size: 22px; font-weight: 900; margin-bottom: 8px; color: #1E40AF; }
+    p { font-size: 14px; color: #64748B; line-height: 1.6; max-width: 320px; margin: 0 auto 24px; }
+    .numeros { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(30,64,175,0.1); width: 100%; max-width: 360px; margin-bottom: 20px; }
+    .numeros h2 { font-size: 14px; font-weight: 800; margin-bottom: 14px; color: #1E293B; }
+    .num { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E2E8F0; }
+    .num:last-child { border-bottom: none; }
+    .num-info { text-align: left; }
+    .num-nom { font-size: 13px; font-weight: 700; }
+    .num-desc { font-size: 11px; color: #64748B; }
+    .num-tel { font-size: 22px; font-weight: 900; color: #1E40AF; text-decoration: none; }
+    .retry-btn {
+      background: #1E40AF; color: white; border: none;
+      padding: 14px 32px; border-radius: 50px; font-size: 15px;
+      font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+    .offline-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #FEF2F2; color: #DC2626; border-radius: 20px;
+      padding: 6px 14px; font-size: 12px; font-weight: 700; margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon" aria-hidden="true">📵</div>
+  <div class="offline-badge">⚠️ Pas de connexion internet</div>
+  <h1>ElanProtect est hors ligne</h1>
+  <p>Vous n'avez pas de connexion internet. Les numéros d'urgence restent disponibles — appelez directement.</p>
+
+  <div class="numeros" role="region" aria-label="Numéros d'urgence">
+    <h2>🆘 Numéros d'urgence (toujours disponibles)</h2>
+    <div class="num">
+      <div class="num-info"><div class="num-nom">🏠 SAMU Social</div><div class="num-desc">Hébergement d'urgence 24h/24</div></div>
+      <a class="num-tel" href="tel:115" aria-label="Appeler le 115, SAMU Social">115</a>
+    </div>
+    <div class="num">
+      <div class="num-info"><div class="num-nom">🚑 SAMU</div><div class="num-desc">Urgence médicale</div></div>
+      <a class="num-tel" href="tel:15" aria-label="Appeler le 15, SAMU">15</a>
+    </div>
+    <div class="num">
+      <div class="num-info"><div class="num-nom">🚔 Police</div><div class="num-desc">Urgence sécurité</div></div>
+      <a class="num-tel" href="tel:17" aria-label="Appeler le 17, Police">17</a>
+    </div>
+    <div class="num">
+      <div class="num-info"><div class="num-nom">🔥 Pompiers</div><div class="num-desc">Incendie, accident</div></div>
+      <a class="num-tel" href="tel:18" aria-label="Appeler le 18, Pompiers">18</a>
+    </div>
+    <div class="num">
+      <div class="num-info"><div class="num-nom">🍽️ Restos du Cœur</div><div class="num-desc">Aide alimentaire nationale</div></div>
+      <a class="num-tel" href="tel:0800130130" aria-label="Appeler le 0800 130 130, Restos du Cœur" style="font-size:14px">0800 130 130</a>
+    </div>
+  </div>
+
+  <button class="retry-btn" onclick="window.location.reload()" aria-label="Réessayer de se connecter">
+    🔄 Réessayer
+  </button>
+
+  <p style="margin-top:16px;font-size:11px;color:#94A3B8">
+    ElanProtect — Anonyme · Gratuit · Sans inscription
+  </p>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElanProtect — Flyers à imprimer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bleu: #1E40AF;
+      --bleu-clair: #3B82F6;
+      --vert: #16A34A;
+      --rouge: #DC2626;
+      --orange: #F97316;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #E5E7EB;
+      padding: 20px;
+      color: #1E293B;
+    }
+
+    /* ── Contrôles hors impression ── */
+    .controls {
+      max-width: 900px; margin: 0 auto 20px;
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      background: white; padding: 16px 20px; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .controls h1 { font-size: 18px; font-weight: 900; color: var(--bleu); flex: 1; }
+    .btn-print {
+      background: var(--bleu); color: white; border: none;
+      padding: 10px 22px; border-radius: 8px; font-size: 14px;
+      font-weight: 700; cursor: pointer;
+    }
+    .btn-format {
+      background: #F1F5F9; border: 2px solid #CBD5E1; color: #334155;
+      padding: 8px 16px; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-format.active { border-color: var(--bleu); background: #EFF6FF; color: var(--bleu); }
+    .url-input {
+      flex: 1; min-width: 200px; padding: 8px 12px;
+      border: 2px solid #CBD5E1; border-radius: 8px; font-size: 13px;
+    }
+    .url-label { font-size: 13px; color: #64748B; font-weight: 600; }
+
+    /* ── Grille A4 ── */
+    .page-a4 {
+      width: 210mm; min-height: 297mm;
+      background: white;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      display: grid;
+      position: relative;
+    }
+    .page-a4.format-a5 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+    .page-a4.format-quart { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .page-a4.format-plein { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+
+    /* ── Flyer individuel ── */
+    .flyer {
+      display: flex; flex-direction: column;
+      padding: 0; overflow: hidden;
+      position: relative;
+      border: 0.5mm dashed #CBD5E1;
+    }
+    .page-a4.format-plein .flyer { border: none; }
+
+    /* Header du flyer */
+    .flyer-header {
+      background: linear-gradient(135deg, var(--bleu), #3B82F6);
+      color: white; padding: 16px 18px 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .flyer-logo { font-size: 30px; }
+    .flyer-brand { flex: 1; }
+    .flyer-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+    .flyer-tagline { font-size: 10px; opacity: 0.85; margin-top: 1px; }
+    .flyer-badge {
+      background: rgba(255,255,255,0.2); border-radius: 20px;
+      padding: 4px 10px; font-size: 9px; font-weight: 800; white-space: nowrap;
+    }
+
+    /* Corps */
+    .flyer-body { flex: 1; display: flex; flex-direction: column; padding: 14px 16px; gap: 10px; }
+
+    .flyer-phrase {
+      font-size: 14px; font-weight: 800; color: var(--bleu);
+      line-height: 1.3; text-align: center;
+      background: #EFF6FF; border-radius: 8px; padding: 10px;
+    }
+    .format-quart .flyer-phrase { font-size: 12px; }
+
+    /* QR + features */
+    .flyer-middle {
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .flyer-qr {
+      flex-shrink: 0; text-align: center;
+    }
+    .flyer-qr img { width: 90px; height: 90px; display: block; border-radius: 6px; }
+    .flyer-qr-label { font-size: 8px; color: #64748B; margin-top: 4px; font-weight: 700; }
+    .format-plein .flyer-qr img { width: 130px; height: 130px; }
+
+    .flyer-features { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 7px; font-size: 11px; line-height: 1.4;
+    }
+    .format-plein .feature-item { font-size: 13px; gap: 10px; }
+    .feature-icon { font-size: 16px; flex-shrink: 0; }
+    .format-plein .feature-icon { font-size: 20px; }
+    .feature-text strong { font-weight: 800; display: block; }
+    .feature-text span { color: #64748B; }
+
+    /* Numéros urgence */
+    .flyer-urgence {
+      background: #FEF2F2; border: 1.5px solid #FECACA;
+      border-radius: 8px; padding: 8px 10px;
+    }
+    .urgence-title { font-size: 10px; font-weight: 800; color: var(--rouge); margin-bottom: 6px; }
+    .urgence-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; }
+    .urgence-num { font-size: 16px; font-weight: 900; color: var(--bleu); line-height: 1; }
+    .urgence-label { font-size: 8px; color: #64748B; font-weight: 600; }
+    .format-plein .urgence-num { font-size: 22px; }
+    .format-plein .urgence-label { font-size: 10px; }
+
+    /* Footer */
+    .flyer-footer {
+      background: #1E293B; color: white;
+      padding: 8px 14px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .flyer-url { font-size: 12px; font-weight: 800; }
+    .flyer-anon { font-size: 9px; opacity: 0.7; }
+    .format-plein .flyer-url { font-size: 16px; }
+
+    /* ── Impression ── */
+    @media print {
+      body { background: white; padding: 0; }
+      .controls { display: none !important; }
+      .page-a4 {
+        width: 210mm; min-height: 297mm;
+        margin: 0; box-shadow: none;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Contrôles (cachés à l'impression) -->
+<div class="controls">
+  <h1>🖨️ Flyers ElanProtect</h1>
+  <div>
+    <label class="url-label">URL de l'app :</label>
+    <input class="url-input" id="app-url" value="https://elanprotect.fr" oninput="updateQR()">
+  </div>
+  <button class="btn-format active" id="btn-quart" onclick="setFormat('quart')">4 par page</button>
+  <button class="btn-format" id="btn-a5" onclick="setFormat('a5')">2 par page (A5)</button>
+  <button class="btn-format" id="btn-plein" onclick="setFormat('plein')">1 par page (A4)</button>
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+</div>
+
+<!-- Page A4 -->
+<div class="page-a4 format-quart" id="page-a4">
+  <!-- Les flyers sont injectés par JS -->
+</div>
+
+<script>
+  let currentFormat = 'quart';
+  const formatCounts = { quart: 4, a5: 2, plein: 1 };
+
+  function getQrUrl() {
+    const url = document.getElementById('app-url').value || 'https://elanprotect.fr';
+    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=1E40AF&bgcolor=FFFFFF&qzone=1&data=${encodeURIComponent(url)}`;
+  }
+
+  function buildFlyer(format) {
+    const url = document.getElementById('app-url').value || 'https://elanprotect.fr';
+    const qrSrc = getQrUrl();
+    return `
+      <div class="flyer">
+        <div class="flyer-header">
+          <div class="flyer-logo" aria-hidden="true">🤝</div>
+          <div class="flyer-brand">
+            <div class="flyer-name">ElanProtect</div>
+            <div class="flyer-tagline">Entraide Solidaire</div>
+          </div>
+          <div class="flyer-badge">🔒 GRATUIT</div>
+        </div>
+
+        <div class="flyer-body">
+          <div class="flyer-phrase">
+            Vous êtes à la rue ou vous voyez quelqu'un en difficulté ?<br>
+            <span style="color:#16A34A">Scannez — c'est anonyme et gratuit.</span>
+          </div>
+
+          <div class="flyer-middle">
+            <div class="flyer-qr">
+              <img src="${qrSrc}" alt="QR code ElanProtect" loading="lazy">
+              <div class="flyer-qr-label">📱 Scannez avec votre téléphone</div>
+            </div>
+            <div class="flyer-features">
+              <div class="feature-item">
+                <span class="feature-icon" aria-hidden="true">🗺️</span>
+                <div class="feature-text">
+                  <strong>Carte des ressources</strong>
+                  <span>Repas, hébergement, douches proches</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon" aria-hidden="true">📅</span>
+                <div class="feature-text">
+                  <strong>Agenda distributions</strong>
+                  <span>Restos du Cœur, maraudes SAMU Social</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon" aria-hidden="true">💬</span>
+                <div class="feature-text">
+                  <strong>Tchat communautaire</strong>
+                  <span>Anonyme, par ville, sans inscription</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon" aria-hidden="true">🧭</span>
+                <div class="feature-text">
+                  <strong>Guide personnalisé</strong>
+                  <span>Démarches, droits, étapes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flyer-urgence">
+            <div class="urgence-title">🆘 Urgences — Appels gratuits 24h/24</div>
+            <div class="urgence-grid">
+              <div><div class="urgence-num">115</div><div class="urgence-label">🏠 Hébergement</div></div>
+              <div><div class="urgence-num">15</div><div class="urgence-label">🚑 SAMU</div></div>
+              <div><div class="urgence-num">17</div><div class="urgence-label">🚔 Police</div></div>
+              <div><div class="urgence-num">18</div><div class="urgence-label">🔥 Pompiers</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flyer-footer">
+          <div class="flyer-url">${url.replace('https://', '')}</div>
+          <div class="flyer-anon">Anonyme · Sans inscription · Sans publicité</div>
+        </div>
+      </div>`;
+  }
+
+  function renderFlyers() {
+    const page = document.getElementById('page-a4');
+    const count = formatCounts[currentFormat];
+    page.innerHTML = Array.from({ length: count }, () => buildFlyer(currentFormat)).join('');
+  }
+
+  function setFormat(f) {
+    currentFormat = f;
+    const page = document.getElementById('page-a4');
+    page.className = `page-a4 format-${f}`;
+    document.querySelectorAll('.btn-format').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-${f}`).classList.add('active');
+    renderFlyers();
+  }
+
+  function updateQR() { renderFlyers(); }
+
+  // Init
+  renderFlyers();
+</script>
+</body>
+</html>
