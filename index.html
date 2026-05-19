@@ -364,6 +364,97 @@
     }
     .send-btn:hover { background: var(--bleu-clair); }
 
+    /* ========== PAGE GUIDE ========== */
+    #page-guide { overflow-y: auto; }
+
+    .guide-hero {
+      background: linear-gradient(135deg, #1E40AF, #7C3AED);
+      color: white; padding: 28px 20px; text-align: center;
+    }
+    .guide-hero .icon { font-size: 52px; margin-bottom: 12px; }
+    .guide-hero h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .guide-hero p { font-size: 13px; opacity: 0.9; line-height: 1.6; }
+
+    .guide-questions { padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+
+    .question-card {
+      background: var(--blanc); border-radius: var(--radius);
+      padding: 20px; box-shadow: var(--shadow);
+    }
+    .question-label {
+      font-size: 15px; font-weight: 800; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .reponses { display: flex; flex-direction: column; gap: 8px; }
+    .reponse-btn {
+      padding: 12px 16px; border: 2px solid var(--gris-clair);
+      border-radius: 12px; background: var(--blanc); font-size: 14px;
+      font-weight: 600; cursor: pointer; text-align: left;
+      transition: all 0.2s; display: flex; align-items: center; gap: 10px;
+    }
+    .reponse-btn:hover { border-color: var(--bleu); background: #EFF6FF; }
+    .reponse-btn.selected { border-color: var(--bleu); background: var(--bleu); color: white; }
+
+    .guide-btn-lancer {
+      background: linear-gradient(135deg, #1E40AF, #7C3AED);
+      color: white; border: none; padding: 16px;
+      border-radius: var(--radius); font-size: 16px; font-weight: 800;
+      cursor: pointer; width: calc(100% - 32px); margin: 0 16px 20px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+
+    /* PLAN PERSONNALISÉ */
+    .plan-container { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    .plan-header {
+      background: linear-gradient(135deg, #1E40AF, #7C3AED);
+      color: white; border-radius: var(--radius); padding: 20px; text-align: center;
+    }
+    .plan-header h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .plan-header p { font-size: 12px; opacity: 0.9; }
+
+    .plan-etape {
+      background: var(--blanc); border-radius: var(--radius);
+      padding: 18px; box-shadow: var(--shadow);
+      border-left: 4px solid var(--bleu);
+    }
+    .plan-etape.urgent { border-left-color: var(--rouge); }
+    .plan-etape.important { border-left-color: var(--orange); }
+    .plan-etape.normal { border-left-color: var(--vert); }
+
+    .plan-etape-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .plan-etape-num {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--bleu); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 13px; flex-shrink: 0;
+    }
+    .plan-etape.urgent .plan-etape-num { background: var(--rouge); }
+    .plan-etape.important .plan-etape-num { background: var(--orange); }
+    .plan-etape.normal .plan-etape-num { background: var(--vert); }
+
+    .plan-etape-titre { font-size: 15px; font-weight: 800; }
+    .plan-etape-desc { font-size: 13px; color: var(--gris); line-height: 1.6; margin-bottom: 10px; }
+    .plan-etape-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .plan-action-btn {
+      padding: 8px 14px; border-radius: 10px; font-size: 12px;
+      font-weight: 700; cursor: pointer; border: none; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .plan-action-appel { background: var(--rouge); color: white; }
+    .plan-action-carte { background: var(--bleu); color: white; }
+    .plan-action-tchat { background: var(--vert); color: white; }
+    .plan-action-info { background: var(--gris-clair); color: var(--texte); }
+
+    .plan-recommencer {
+      background: var(--fond); border: 2px solid var(--gris-clair);
+      border-radius: var(--radius); padding: 14px; text-align: center;
+      cursor: pointer; font-size: 14px; font-weight: 600; color: var(--gris);
+      margin-bottom: 8px;
+    }
+
     /* ========== PAGE SIGNALEMENT ========== */
     #page-signalement { overflow-y: auto; padding: 20px 16px; gap: 16px; }
 
@@ -1002,6 +1093,87 @@
   </div>
 </div>
 
+<!-- ===== PAGE GUIDE ===== -->
+<div class="page" id="page-guide">
+
+  <div id="guide-questions-screen">
+    <div class="guide-hero">
+      <div class="icon">🧭</div>
+      <h2>Je suis à la rue</h2>
+      <p>Réponds à quelques questions.<br>On te donne un plan d'action personnalisé immédiat.</p>
+    </div>
+
+    <div class="guide-questions">
+
+      <div class="question-card">
+        <div class="question-label">📍 Tu es dans quelle ville ?</div>
+        <div class="reponses">
+          <button class="reponse-btn" onclick="selectReponse(this, 'ville', 'Paris')">🗼 Paris</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'ville', 'Lyon')">🦁 Lyon</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'ville', 'Marseille')">⛵ Marseille</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'ville', 'Autre')">📌 Autre ville</button>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-label">🌙 Tu as où dormir ce soir ?</div>
+        <div class="reponses">
+          <button class="reponse-btn" onclick="selectReponse(this, 'logement', 'non')">❌ Non, rien</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'logement', 'peut-etre')">🤔 Pas sûr</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'logement', 'oui')">✅ Oui pour ce soir</button>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-label">🍽️ Tu as mangé aujourd'hui ?</div>
+        <div class="reponses">
+          <button class="reponse-btn" onclick="selectReponse(this, 'nourriture', 'non')">❌ Non pas encore</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'nourriture', 'peu')">🙁 Un peu seulement</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'nourriture', 'oui')">✅ Oui ça va</button>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-label">📄 Tu as tes papiers d'identité ?</div>
+        <div class="reponses">
+          <button class="reponse-btn" onclick="selectReponse(this, 'papiers', 'oui')">✅ Oui je les ai</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'papiers', 'perdus')">😟 Perdus ou volés</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'papiers', 'jamais')">❓ Je n'en ai jamais eu</button>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-label">🏥 Tu as des problèmes de santé urgents ?</div>
+        <div class="reponses">
+          <button class="reponse-btn" onclick="selectReponse(this, 'sante', 'urgent')">🚨 Oui, c'est urgent</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'sante', 'traitement')">💊 Oui, j'ai un traitement</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'sante', 'non')">✅ Non ça va</button>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-label">👨‍👩‍👧 Tu es seul(e) ?</div>
+        <div class="reponses">
+          <button class="reponse-btn" onclick="selectReponse(this, 'situation', 'seul')">🧍 Seul(e)</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'situation', 'enfants')">👶 Avec des enfants</button>
+          <button class="reponse-btn" onclick="selectReponse(this, 'situation', 'couple')">👫 En couple</button>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="guide-btn-lancer" onclick="genererPlan()">
+      🧭 Générer mon plan d'action
+    </button>
+  </div>
+
+  <!-- PLAN PERSONNALISÉ -->
+  <div id="guide-plan-screen" style="display:none">
+    <div class="plan-container" id="plan-container"></div>
+  </div>
+
+</div>
+
 <!-- ===== PAGE DONS ===== -->
 <div class="page" id="page-dons">
 
@@ -1109,8 +1281,8 @@
   <button class="nav-btn" id="nav-carte" onclick="goTo('carte')">
     <span class="icon">🗺️</span>Carte
   </button>
-  <button class="nav-btn" id="nav-tchat" onclick="goTo('tchat')">
-    <span class="icon">💬</span>Tchat
+  <button class="nav-btn" id="nav-guide" onclick="goTo('guide')">
+    <span class="icon">🧭</span>Guide
   </button>
   <button class="nav-btn" id="nav-dons" onclick="goTo('dons')">
     <span class="icon">🎁</span>Dons
@@ -1368,6 +1540,190 @@ async function envoyerSignalement() {
   } catch(e) {
     toast('Erreur réseau. Appelez le 115.');
   }
+}
+
+// ===== GUIDE "JE SUIS À LA RUE" =====
+const reponses = {};
+
+function selectReponse(btn, question, valeur) {
+  const parent = btn.closest('.reponses');
+  parent.querySelectorAll('.reponse-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  reponses[question] = valeur;
+}
+
+function genererPlan() {
+  const r = reponses;
+  const ville = r.ville || 'votre ville';
+  const etapes = [];
+  let num = 1;
+
+  // URGENCE SANTÉ EN PREMIER
+  if (r.sante === 'urgent') {
+    etapes.push({
+      priorite: 'urgent', num: num++,
+      icon: '🚑', titre: 'Urgence médicale — Appelez le 15',
+      desc: 'Tu as un problème de santé urgent. Appelle le SAMU immédiatement, c\'est gratuit 24h/24.',
+      actions: [
+        { label: '📞 Appeler le 15', href: 'tel:15', style: 'appel' },
+        { label: '📞 Appeler le 18', href: 'tel:18', style: 'appel' },
+      ]
+    });
+  }
+
+  // HÉBERGEMENT CE SOIR
+  if (r.logement === 'non' || r.logement === 'peut-etre') {
+    let descLogement = 'Appelle le 115 maintenant — c\'est gratuit, 24h/24. Ils t\'orientent vers un hébergement d\'urgence à ' + ville + '.';
+    if (r.situation === 'enfants') {
+      descLogement = '⚠️ Tu as des enfants — c\'est une priorité absolue. Le 115 a l\'obligation de t\'héberger avec tes enfants ce soir.';
+    }
+    etapes.push({
+      priorite: 'urgent', num: num++,
+      icon: '🏠', titre: 'Hébergement ce soir — Appelle le 115',
+      desc: descLogement,
+      actions: [
+        { label: '📞 Appeler le 115', href: 'tel:115', style: 'appel' },
+        { label: '🗺️ Centres d\'hébergement', onclick: "goTo('carte')", style: 'carte' },
+      ]
+    });
+  }
+
+  // NOURRITURE
+  if (r.nourriture === 'non' || r.nourriture === 'peu') {
+    etapes.push({
+      priorite: 'important', num: num++,
+      icon: '🍽️', titre: 'Trouver à manger maintenant',
+      desc: 'Les Restos du Cœur et distributions solidaires sont près de toi. Regarde la carte pour les points repas à ' + ville + '.',
+      actions: [
+        { label: '🗺️ Points repas proches', onclick: "goTo('carte')", style: 'carte' },
+        { label: '💬 Demander dans le tchat', onclick: "goTo('tchat')", style: 'tchat' },
+      ]
+    });
+  }
+
+  // SANTÉ - TRAITEMENT
+  if (r.sante === 'traitement') {
+    etapes.push({
+      priorite: 'important', num: num++,
+      icon: '💊', titre: 'Continuer ton traitement médical',
+      desc: 'Rends-toi dans une PASS (Permanence d\'Accès aux Soins) — soins et médicaments gratuits sans carte vitale. Les urgences de l\'hôpital ne peuvent pas te refuser.',
+      actions: [
+        { label: '📞 SAMU Social 115', href: 'tel:115', style: 'appel' },
+        { label: 'ℹ️ Plus d\'infos', onclick: "goTo('ressources')", style: 'info' },
+      ]
+    });
+  }
+
+  // PAPIERS PERDUS
+  if (r.papiers === 'perdus') {
+    etapes.push({
+      priorite: 'important', num: num++,
+      icon: '📄', titre: 'Refaire tes papiers d\'identité',
+      desc: 'Va à la mairie avec un travailleur social. Si tu n\'as pas d\'adresse, un CCAS ou une association peut te donner une domiciliation pour recevoir ton courrier.',
+      actions: [
+        { label: '💬 Aide dans le tchat', onclick: "goTo('tchat')", style: 'tchat' },
+        { label: 'ℹ️ Démarches', onclick: "goTo('ressources')", style: 'info' },
+      ]
+    });
+  }
+
+  if (r.papiers === 'jamais') {
+    etapes.push({
+      priorite: 'important', num: num++,
+      icon: '📄', titre: 'Obtenir tes papiers d\'identité',
+      desc: 'Tu as le droit d\'obtenir une CNI. Des associations spécialisées t\'aident gratuitement (France Terre d\'Asile, Secours Catholique). Contacte le SAMU Social.',
+      actions: [
+        { label: '📞 Appeler le 115', href: 'tel:115', style: 'appel' },
+        { label: 'ℹ️ Démarches', onclick: "goTo('ressources')", style: 'info' },
+      ]
+    });
+  }
+
+  // DOMICILIATION (toujours utile)
+  etapes.push({
+    priorite: 'normal', num: num++,
+    icon: '📮', titre: 'Obtenir une adresse postale (domiciliation)',
+    desc: 'Sans adresse tu ne peux pas avoir de droits (CAF, Pôle Emploi, Sécu). Un CCAS ou une association agréée te donne une adresse gratuite.',
+    actions: [
+      { label: '💬 Demander de l\'aide', onclick: "goTo('tchat')", style: 'tchat' },
+      { label: 'ℹ️ Ressources', onclick: "goTo('ressources')", style: 'info' },
+    ]
+  });
+
+  // HYGIÈNE
+  etapes.push({
+    priorite: 'normal', num: num++,
+    icon: '🚿', titre: 'Accès aux douches et hygiène',
+    desc: 'Des douches gratuites sont disponibles dans ta ville. Regarde la carte pour les points hygiène proches.',
+    actions: [
+      { label: '🗺️ Douches proches', onclick: "goTo('carte')", style: 'carte' },
+    ]
+  });
+
+  // AVEC ENFANTS - droits supplémentaires
+  if (r.situation === 'enfants') {
+    etapes.push({
+      priorite: 'important', num: num++,
+      icon: '👶', titre: 'Protection renforcée pour tes enfants',
+      desc: 'Avec des enfants, tu as des droits prioritaires : hébergement garanti (DAHO), allocations CAF maintenues, maintien scolarité. Contacte immédiatement l\'ASE si besoin.',
+      actions: [
+        { label: '📞 115 Priorité famille', href: 'tel:115', style: 'appel' },
+        { label: 'ℹ️ Tes droits', onclick: "goTo('ressources')", style: 'info' },
+      ]
+    });
+  }
+
+  // EMPLOI & RECONSTRUCTION
+  etapes.push({
+    priorite: 'normal', num: num++,
+    icon: '💼', titre: 'Inscription France Travail',
+    desc: 'Même sans adresse tu peux t\'inscrire à France Travail avec une domiciliation. Ça ouvre des droits (ARE, RSA, formations) et aide à te reconstruire.',
+    actions: [
+      { label: 'ℹ️ Parcours complet', onclick: "goTo('ressources')", style: 'info' },
+      { label: '💬 Tchat emploi', onclick: "changerSalon(document.querySelector('[onclick*=\"Emploi\"]'), 'Emploi'); goTo('tchat')", style: 'tchat' },
+    ]
+  });
+
+  // AFFICHER LE PLAN
+  const container = document.getElementById('plan-container');
+  const couleursStyle = { urgent: 'var(--rouge)', important: 'var(--orange)', normal: 'var(--vert)' };
+
+  container.innerHTML = `
+    <div class="plan-header">
+      <div style="font-size:40px;margin-bottom:10px">🧭</div>
+      <h3>Ton plan personnalisé</h3>
+      <p>Pour ${ville} · ${etapes.length} étapes prioritaires</p>
+    </div>
+    ${etapes.map(e => `
+      <div class="plan-etape ${e.priorite}">
+        <div class="plan-etape-header">
+          <div class="plan-etape-num">${e.num}</div>
+          <div class="plan-etape-titre">${e.icon} ${e.titre}</div>
+        </div>
+        <div class="plan-etape-desc">${e.desc}</div>
+        <div class="plan-etape-actions">
+          ${e.actions.map(a => a.href
+            ? `<a href="${a.href}" class="plan-action-btn plan-action-${a.style}">${a.label}</a>`
+            : `<button onclick="${a.onclick}" class="plan-action-btn plan-action-${a.style}">${a.label}</button>`
+          ).join('')}
+        </div>
+      </div>
+    `).join('')}
+    <div class="plan-recommencer" onclick="recommencerGuide()">
+      🔄 Recommencer le guide
+    </div>
+  `;
+
+  document.getElementById('guide-questions-screen').style.display = 'none';
+  document.getElementById('guide-plan-screen').style.display = 'block';
+  document.getElementById('guide-plan-screen').scrollTop = 0;
+}
+
+function recommencerGuide() {
+  Object.keys(reponses).forEach(k => delete reponses[k]);
+  document.querySelectorAll('.reponse-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('guide-plan-screen').style.display = 'none';
+  document.getElementById('guide-questions-screen').style.display = 'block';
 }
 
 // ===== SIGNALEMENT - ÉCRANS =====
