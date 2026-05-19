@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — MainTendue</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bleu: #1E40AF; --bleu-clair: #3B82F6; --orange: #F97316;
+      --vert: #16A34A; --rouge: #DC2626; --fond: #F0F4FF;
+      --blanc: #fff; --texte: #1E293B; --gris: #64748B;
+      --gris-clair: #E2E8F0; --radius: 12px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--fond); color: var(--texte); min-height: 100vh; }
+
+    /* LOGIN */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .login-box {
+      background: var(--blanc); border-radius: 20px; padding: 40px; max-width: 380px; width: 100%;
+      box-shadow: 0 8px 40px rgba(30,64,175,0.15); text-align: center;
+    }
+    .login-logo { font-size: 52px; margin-bottom: 16px; }
+    .login-title { font-size: 24px; font-weight: 800; color: var(--bleu); margin-bottom: 6px; }
+    .login-sub { font-size: 13px; color: var(--gris); margin-bottom: 28px; }
+    .login-input {
+      width: 100%; padding: 14px 16px; border: 2px solid var(--gris-clair);
+      border-radius: 12px; font-size: 16px; outline: none; margin-bottom: 14px; text-align: center; letter-spacing: 3px;
+    }
+    .login-input:focus { border-color: var(--bleu); }
+    .login-btn {
+      width: 100%; background: var(--bleu); color: white; border: none;
+      padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .login-err { color: var(--rouge); font-size: 13px; margin-top: 10px; }
+
+    /* ADMIN UI */
+    #admin-screen { display: none; }
+
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
+      background: var(--bleu); color: white; padding: 20px 0; z-index: 100;
+      display: flex; flex-direction: column;
+    }
+    .sidebar-logo { padding: 0 20px 24px; font-size: 20px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.15); }
+    .sidebar-sub { font-size: 11px; opacity: 0.7; font-weight: 400; }
+    .nav-item {
+      padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 500; transition: background 0.2s; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.1); }
+    .nav-item.active { background: rgba(255,255,255,0.15); border-left-color: white; }
+    .nav-item .icon { font-size: 18px; width: 24px; }
+    .badge {
+      margin-left: auto; background: var(--rouge); color: white;
+      font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center;
+    }
+    .sidebar-logout {
+      margin-top: auto; padding: 12px 20px; cursor: pointer; font-size: 13px;
+      opacity: 0.7; display: flex; align-items: center; gap: 8px;
+    }
+    .sidebar-logout:hover { opacity: 1; }
+
+    .main { margin-left: 220px; padding: 28px; min-height: 100vh; }
+    .page-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; color: var(--texte); }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--blanc); border-radius: var(--radius); padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center;
+    }
+    .stat-num { font-size: 36px; font-weight: 900; color: var(--bleu); }
+    .stat-label { font-size: 12px; color: var(--gris); margin-top: 4px; }
+
+    /* TABLES */
+    .card {
+      background: var(--blanc); border-radius: var(--radius); padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--fond); padding: 10px 12px; text-align: left; font-weight: 700; color: var(--gris); }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--gris-clair); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #F8FAFF; }
+
+    .badge-type {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge-froid { background: #DBEAFE; color: #1E40AF; }
+    .badge-faim { background: #FEF3C7; color: #92400E; }
+    .badge-medical { background: #FCE7F3; color: #9D174D; }
+    .badge-danger { background: #FEE2E2; color: #991B1B; }
+    .badge-ok { background: #D1FAE5; color: #065F46; }
+    .badge-pending { background: #FEF3C7; color: #92400E; }
+    .badge-donne { background: #D1FAE5; color: #065F46; }
+    .badge-cherche { background: #DBEAFE; color: #1E40AF; }
+
+    .btn {
+      padding: 6px 14px; border: none; border-radius: 8px;
+      font-size: 12px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.8; }
+    .btn-vert { background: var(--vert); color: white; }
+    .btn-rouge { background: var(--rouge); color: white; }
+    .btn-bleu { background: var(--bleu); color: white; }
+    .btn-gris { background: var(--gris-clair); color: var(--texte); }
+    .btn-orange { background: var(--orange); color: white; }
+
+    /* FORM */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 600; }
+    .form-input, .form-select, .form-textarea {
+      padding: 10px 14px; border: 2px solid var(--gris-clair);
+      border-radius: 10px; font-size: 14px; font-family: inherit; outline: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--bleu); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-submit {
+      background: var(--bleu); color: white; border: none; padding: 12px 24px;
+      border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+
+    /* MAP PREVIEW */
+    #map-admin { height: 300px; border-radius: 12px; margin-bottom: 16px; }
+
+    /* FILTRES */
+    .filtres { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filtre-btn {
+      padding: 6px 14px; border: 2px solid var(--gris-clair); background: var(--blanc);
+      border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .filtre-btn.active { background: var(--bleu); color: white; border-color: var(--bleu); }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--texte); color: white; padding: 12px 20px;
+      border-radius: 12px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s; z-index: 999;
+    }
+    .toast.visible { opacity: 1; }
+
+    .empty { text-align: center; color: var(--gris); padding: 32px; font-size: 14px; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; }
+      .nav-item span:not(.icon) { display: none; }
+      .sidebar-logo .title-text { display: none; }
+      .main { margin-left: 60px; padding: 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🤝</div>
+    <div class="login-title">MainTendue Admin</div>
+    <div class="login-sub">Panneau d'administration</div>
+    <input class="login-input" type="password" id="login-pwd" placeholder="Mot de passe" onkeydown="if(event.key==='Enter') login()">
+    <button class="login-btn" onclick="login()">Connexion</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen">
+  <div class="sidebar">
+    <div class="sidebar-logo">🤝 <span class="title-text">Admin</span></div>
+    <div class="nav-item active" onclick="showSection('dashboard')"><span class="icon">📊</span><span>Dashboard</span></div>
+    <div class="nav-item" onclick="showSection('signalements')"><span class="icon">🆘</span><span>Signalements</span><span class="badge" id="badge-signalements">0</span></div>
+    <div class="nav-item" onclick="showSection('moderation')"><span class="icon">🛡️</span><span>Modération</span><span class="badge" id="badge-moderation">0</span></div>
+    <div class="nav-item" onclick="showSection('carte')"><span class="icon">🗺️</span><span>Carte / Points</span></div>
+    <div class="nav-item" onclick="showSection('dons')"><span class="icon">🎁</span><span>Dons</span></div>
+    <div class="sidebar-logout" onclick="logout()"><span>🚪</span><span>Déconnexion</span></div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="section-dashboard">
+      <div class="page-title">📊 Dashboard</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="s-connectes">—</div><div class="stat-label">Connectés</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-points">—</div><div class="stat-label">Points d'aide actifs</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-signalements">—</div><div class="stat-label">Signalements total</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-dons">—</div><div class="stat-label">Dons actifs</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-messages">—</div><div class="stat-label">Messages (24h)</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-signales" style="color:var(--rouge)">—</div><div class="stat-label">Messages signalés</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">ℹ️ Accès rapides</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-rouge" onclick="showSection('signalements')">🆘 Voir signalements</button>
+          <button class="btn btn-orange" onclick="showSection('moderation')">🛡️ Modération</button>
+          <button class="btn btn-bleu" onclick="showSection('carte')">🗺️ Gérer la carte</button>
+          <button class="btn btn-vert" onclick="showSection('dons')">🎁 Gérer les dons</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNALEMENTS -->
+    <div class="section" id="section-signalements">
+      <div class="page-title">🆘 Signalements d'urgence</div>
+      <div class="filtres">
+        <button class="filtre-btn active" onclick="filtreSignalement(this,'all')">Tous</button>
+        <button class="filtre-btn" onclick="filtreSignalement(this,'pending')">⏳ Non traités</button>
+        <button class="filtre-btn" onclick="filtreSignalement(this,'done')">✅ Traités</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Ville</th><th>Message</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody id="tbody-signalements"><tr><td colspan="6" class="empty">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODÉRATION -->
+    <div class="section" id="section-moderation">
+      <div class="page-title">🛡️ Modération du tchat</div>
+      <div class="card">
+        <div class="card-title">Messages signalés par la communauté</div>
+        <table>
+          <thead><tr><th>Salon</th><th>Pseudo</th><th>Message</th><th>Signalements</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="tbody-moderation"><tr><td colspan="6" class="empty">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CARTE -->
+    <div class="section" id="section-carte">
+      <div class="page-title">🗺️ Gestion des points d'aide</div>
+      <div class="card">
+        <div class="card-title">➕ Ajouter un point</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nom du lieu</label>
+            <input class="form-input" id="p-nom" placeholder="Ex: Restos du Cœur Paris 15">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-select" id="p-type">
+              <option value="repas">🍽️ Repas</option>
+              <option value="hebergement">🏠 Hébergement</option>
+              <option value="douche">🚿 Douches</option>
+              <option value="wifi">📶 Wifi</option>
+              <option value="recharge">🔌 Recharge téléphone</option>
+              <option value="vestimentaire">👕 Vêtements</option>
+              <option value="medical">🏥 Soins médicaux</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ville</label>
+            <input class="form-input" id="p-ville" placeholder="Paris">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse</label>
+            <input class="form-input" id="p-adresse" placeholder="123 Rue de la Paix, 75001">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Latitude</label>
+            <input class="form-input" id="p-lat" placeholder="48.8566" type="number" step="0.0001">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Longitude</label>
+            <input class="form-input" id="p-lng" placeholder="2.3522" type="number" step="0.0001">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Horaires</label>
+            <input class="form-input" id="p-horaires" placeholder="Lun-Ven 12h-14h">
+          </div>
+        </div>
+        <button class="form-submit" onclick="ajouterPoint()">➕ Ajouter le point</button>
+      </div>
+      <div id="map-admin"></div>
+      <div class="card">
+        <div class="card-title">📍 Points existants</div>
+        <table>
+          <thead><tr><th>Nom</th><th>Type</th><th>Ville</th><th>Horaires</th><th>Action</th></tr></thead>
+          <tbody id="tbody-points"><tr><td colspan="5" class="empty">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DONS -->
+    <div class="section" id="section-dons">
+      <div class="page-title">🎁 Gestion des dons</div>
+      <div class="filtres">
+        <button class="filtre-btn active" onclick="filtreDons(this,'all')">Tous</button>
+        <button class="filtre-btn" onclick="filtreDons(this,'donne')">🟢 Offres</button>
+        <button class="filtre-btn" onclick="filtreDons(this,'cherche')">🔵 Recherches</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Type</th><th>Catégorie</th><th>Titre</th><th>Ville</th><th>Contact</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="tbody-dons"><tr><td colspan="7" class="empty">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let adminToken = '';
+let mapAdmin;
+let filtreSignalements = 'all';
+let filtreDonsVal = 'all';
+
+// LOGIN
+async function login() {
+  const pwd = document.getElementById('login-pwd').value;
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': pwd },
+      body: JSON.stringify({ password: pwd })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      adminToken = pwd;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      loadAll();
+    } else {
+      document.getElementById('login-err').textContent = 'Mot de passe incorrect';
+    }
+  } catch {
+    document.getElementById('login-err').textContent = 'Erreur de connexion';
+  }
+}
+
+function logout() {
+  adminToken = '';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-pwd').value = '';
+}
+
+function headers() {
+  return { 'Content-Type': 'application/json', 'x-admin-token': adminToken };
+}
+
+// NAVIGATION
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'signalements') loadSignalements();
+  if (name === 'moderation') loadModeration();
+  if (name === 'carte') loadCarte();
+  if (name === 'dons') loadDons();
+}
+
+function loadAll() {
+  loadStats();
+  setInterval(loadStats, 30000);
+}
+
+// TOAST
+let toastTimer;
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = ok ? '#1E293B' : '#DC2626';
+  el.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 3000);
+}
+
+// STATS
+async function loadStats() {
+  try {
+    const res = await fetch('/api/admin/stats', { headers: headers() });
+    const d = await res.json();
+    document.getElementById('s-connectes').textContent = d.connectes;
+    document.getElementById('s-points').textContent = d.points;
+    document.getElementById('s-signalements').textContent = d.signalements;
+    document.getElementById('s-dons').textContent = d.dons;
+    document.getElementById('s-messages').textContent = d.messages;
+    document.getElementById('s-signales').textContent = d.messagesSignales;
+    document.getElementById('badge-signalements').textContent = d.signalements;
+    document.getElementById('badge-moderation').textContent = d.messagesSignales;
+  } catch {}
+}
+
+// SIGNALEMENTS
+const emojisType = { froid: '🥶', faim: '🍞', medical: '🏥', danger: '⚠️' };
+
+async function loadSignalements() {
+  const traite = filtreSignalements === 'done' ? 'true' : filtreSignalements === 'pending' ? 'false' : '';
+  const url = '/api/admin/signalements' + (traite ? '?traite=' + traite : '');
+  const res = await fetch(url, { headers: headers() });
+  const list = await res.json();
+  const tbody = document.getElementById('tbody-signalements');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucun signalement</td></tr>'; return; }
+  tbody.innerHTML = list.map(s => `
+    <tr>
+      <td>${new Date(s.date).toLocaleString('fr-FR')}</td>
+      <td><span class="badge-type badge-${s.type}">${emojisType[s.type] || '🆘'} ${s.type}</span></td>
+      <td>${s.ville}</td>
+      <td>${s.message || '—'}</td>
+      <td><span class="badge-type ${s.traite ? 'badge-ok' : 'badge-pending'}">${s.traite ? '✅ Traité' : '⏳ En attente'}</span></td>
+      <td>${!s.traite ? `<button class="btn btn-vert" onclick="traiterSignalement('${s._id}')">✅ Traiter</button>` : ''}</td>
+    </tr>
+  `).join('');
+}
+
+async function traiterSignalement(id) {
+  await fetch('/api/admin/signalements/traiter', { method: 'POST', headers: headers(), body: JSON.stringify({ id }) });
+  toast('Signalement marqué traité');
+  loadSignalements();
+  loadStats();
+}
+
+function filtreSignalement(btn, val) {
+  document.querySelectorAll('#section-signalements .filtre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtreSignalements = val;
+  loadSignalements();
+}
+
+// MODÉRATION
+async function loadModeration() {
+  const res = await fetch('/api/admin/messages/signales', { headers: headers() });
+  const list = await res.json();
+  const tbody = document.getElementById('tbody-moderation');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucun message signalé ✅</td></tr>'; return; }
+  tbody.innerHTML = list.map(m => `
+    <tr>
+      <td>${m.salon}</td>
+      <td>${m.pseudo}</td>
+      <td style="max-width:300px;word-break:break-word">${m.texte}</td>
+      <td><span style="color:var(--rouge);font-weight:800">${m.signalements}</span></td>
+      <td>${new Date(m.date).toLocaleString('fr-FR')}</td>
+      <td><button class="btn btn-rouge" onclick="supprimerMessage('${m._id}')">🗑️ Supprimer</button></td>
+    </tr>
+  `).join('');
+}
+
+async function supprimerMessage(id) {
+  if (!confirm('Supprimer ce message ?')) return;
+  await fetch('/api/admin/messages/supprimer', { method: 'POST', headers: headers(), body: JSON.stringify({ id }) });
+  toast('Message supprimé');
+  loadModeration();
+  loadStats();
+}
+
+// CARTE
+const typesIcones = { repas: '🍽️', hebergement: '🏠', douche: '🚿', wifi: '📶', recharge: '🔌', vestimentaire: '👕', medical: '🏥' };
+
+async function loadCarte() {
+  if (!mapAdmin) {
+    mapAdmin = L.map('map-admin').setView([46.6034, 1.8883], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapAdmin);
+    mapAdmin.on('click', e => {
+      document.getElementById('p-lat').value = e.latlng.lat.toFixed(6);
+      document.getElementById('p-lng').value = e.latlng.lng.toFixed(6);
+      toast('Coordonnées récupérées du clic carte');
+    });
+  }
+  const res = await fetch('/api/admin/points', { headers: headers() });
+  const points = await res.json();
+  const tbody = document.getElementById('tbody-points');
+  tbody.innerHTML = points.map(p => `
+    <tr>
+      <td>${p.nom}</td>
+      <td>${typesIcones[p.type] || '📍'} ${p.type}</td>
+      <td>${p.ville}</td>
+      <td>${p.horaires}</td>
+      <td>
+        ${p.actif
+          ? `<button class="btn btn-rouge" onclick="supprimerPoint('${p._id}')">🗑️ Désactiver</button>`
+          : '<span style="color:var(--gris);font-size:12px">Inactif</span>'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function ajouterPoint() {
+  const point = {
+    nom: document.getElementById('p-nom').value,
+    type: document.getElementById('p-type').value,
+    ville: document.getElementById('p-ville').value,
+    adresse: document.getElementById('p-adresse').value,
+    lat: document.getElementById('p-lat').value,
+    lng: document.getElementById('p-lng').value,
+    horaires: document.getElementById('p-horaires').value,
+  };
+  if (!point.nom || !point.lat || !point.lng) { toast('Nom, latitude et longitude requis', false); return; }
+  await fetch('/api/admin/points', { method: 'POST', headers: headers(), body: JSON.stringify(point) });
+  toast('Point ajouté avec succès');
+  ['p-nom','p-adresse','p-lat','p-lng','p-horaires'].forEach(id => document.getElementById(id).value = '');
+  loadCarte();
+}
+
+async function supprimerPoint(id) {
+  if (!confirm('Désactiver ce point ?')) return;
+  await fetch('/api/admin/points/supprimer', { method: 'POST', headers: headers(), body: JSON.stringify({ id }) });
+  toast('Point désactivé');
+  loadCarte();
+}
+
+// DONS
+const categoriesIcones = {
+  telephone: '📱', reveil: '⏰', vetements: '👕', chaussures: '👟',
+  sac_couchage: '🛏️', nourriture: '🍞', livres: '📚', medicaments: '💊',
+  transport: '🚌', hygiene: '🧴', competences: '🎓', materiel: '🛠️', autre: '📦'
+};
+
+async function loadDons() {
+  const url = '/api/admin/dons' + (filtreDonsVal !== 'all' ? '?sens=' + filtreDonsVal : '');
+  const res = await fetch('/api/admin/dons', { headers: headers() });
+  const list = await res.json();
+  const filtered = filtreDonsVal === 'all' ? list : list.filter(d => d.sens === filtreDonsVal);
+  const tbody = document.getElementById('tbody-dons');
+  if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucun don</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(d => `
+    <tr>
+      <td><span class="badge-type ${d.sens === 'donne' ? 'badge-donne' : 'badge-cherche'}">${d.sens === 'donne' ? '🟢 Offre' : '🔵 Recherche'}</span></td>
+      <td>${categoriesIcones[d.categorie] || '📦'} ${d.categorie}</td>
+      <td><strong>${d.titre}</strong><br><small style="color:var(--gris)">${d.description || ''}</small></td>
+      <td>${d.ville}</td>
+      <td style="font-size:12px">${d.contact}</td>
+      <td>${new Date(d.date).toLocaleDateString('fr-FR')}</td>
+      <td>${d.actif ? `<button class="btn btn-rouge" onclick="supprimerDon('${d._id}')">🗑️</button>` : '<span style="color:var(--gris);font-size:11px">Supprimé</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+async function supprimerDon(id) {
+  if (!confirm('Supprimer ce don ?')) return;
+  await fetch('/api/admin/dons/supprimer', { method: 'POST', headers: headers(), body: JSON.stringify({ id }) });
+  toast('Don supprimé');
+  loadDons();
+}
+
+function filtreDons(btn, val) {
+  document.querySelectorAll('#section-dons .filtre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtreDonsVal = val;
+  loadDons();
+}
+
+document.getElementById('login-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>
